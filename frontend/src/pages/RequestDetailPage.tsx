@@ -1,4 +1,4 @@
-﻿import { useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Badge,
   Box,
@@ -87,22 +87,22 @@ export function RequestDetailPage() {
     return (
       <Stack gap="lg">
         <PageHeader
-          eyebrow="Ø¬Ø²Ø¦ÛŒØ§Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª"
-          title="Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù¾ÛŒØ¯Ø§ Ù†Ø´Ø¯"
-          description={requestId ? `Ø´Ù†Ø§Ø³Ù‡ ${requestId} Ø¯Ø± Ø¯Ø§Ø¯Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ ÙˆØ¬ÙˆØ¯ Ù†Ø¯Ø§Ø±Ø¯.` : 'Ø´Ù†Ø§Ø³Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª.'}
+          eyebrow="جزئیات درخواست"
+          title="درخواست پیدا نشد"
+          description={requestId ? `شناسه ${requestId} در داده نمایشی وجود ندارد.` : 'شناسه درخواست نامعتبر است.'}
           actions={
             <Button component={Link} to="/requests" variant="default" leftSection={<ArrowRight size={16} />}>
-              Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ ÙÙ‡Ø±Ø³Øª
+              بازگشت به فهرست
             </Button>
           }
         />
         <ErrorState
-          code="Û´Û°Û´"
-          title="Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…ÙˆØ±Ø¯Ù†Ø¸Ø± Ù…ÙˆØ¬ÙˆØ¯ Ù†ÛŒØ³Øª"
-          description="Ù…Ù…Ú©Ù† Ø§Ø³Øª Ø´Ù†Ø§Ø³Ù‡ Ø§Ø´ØªØ¨Ø§Ù‡ Ø¨Ø§Ø´Ø¯ ÛŒØ§ Ø¯Ø§Ø¯Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ Ø¨Ø§Ø²Ù†Ø´Ø§Ù†ÛŒ Ø´Ø¯Ù‡ Ø¨Ø§Ø´Ø¯."
+          code="۴۰۴"
+          title="درخواست موردنظر موجود نیست"
+          description="ممکن است شناسه اشتباه باشد یا داده نمایشی بازنشانی شده باشد."
           action={
             <Button component={Link} to="/requests" leftSection={<ArrowRight size={16} />}>
-              Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù‡Ù…Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§
+              مشاهده همه درخواست‌ها
             </Button>
           }
         />
@@ -124,8 +124,8 @@ export function RequestDetailPage() {
 
   const notifyError = (error: unknown) => {
     notifications.show({
-      title: 'Ø¹Ù…Ù„ÛŒØ§Øª Ø§Ù†Ø¬Ø§Ù… Ù†Ø´Ø¯',
-      message: error instanceof DemoError ? error.message : 'Ø®Ø·Ø§ÛŒ Ù†Ø§Ù…Ø´Ø®Øµ Ø¯Ø± Ø­Ø§Ù„Øª Ù†Ù…Ø§ÛŒØ´ÛŒ Ø±Ø® Ø¯Ø§Ø¯.',
+      title: 'عملیات انجام نشد',
+      message: error instanceof DemoError ? error.message : 'خطای نامشخص در حالت نمایشی رخ داد.',
       color: 'red',
     });
   };
@@ -134,8 +134,8 @@ export function RequestDetailPage() {
     try {
       approveRequest(request.id);
       notifications.show({
-        title: 'Ø¯Ø±Ø®ÙˆØ§Ø³Øª ØªØ£ÛŒÛŒØ¯ Ø´Ø¯',
-        message: 'ÙˆØ¶Ø¹ÛŒØª Ø±Ø³Ù…ÛŒ Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¨Ù‡ open ØªØºÛŒÛŒØ± Ú©Ø±Ø¯.',
+        title: 'درخواست تأیید شد',
+        message: 'وضعیت رسمی درخواست به open تغییر کرد.',
         color: 'green',
         icon: <CheckCircle size={18} weight="fill" />,
       });
@@ -149,8 +149,8 @@ export function RequestDetailPage() {
       cancelRequest(request.id);
       setCancelOpen(false);
       notifications.show({
-        title: 'Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù„ØºÙˆ Ø´Ø¯',
-        message: 'Ø¯Ø± ÙˆØ¶Ø¹ÛŒØª Ù†Ù…Ø§ÛŒØ´ÛŒØŒ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ùˆ ØªØ®ØµÛŒØµâ€ŒÙ‡Ø§ ØªØºÛŒÛŒØ± Ù†Ú©Ø±Ø¯Ù†Ø¯.',
+        title: 'درخواست لغو شد',
+        message: 'در وضعیت نمایشی، تأمین‌شده و تخصیص‌ها تغییر نکردند.',
         color: 'orange',
       });
     } catch (error) {
@@ -163,8 +163,8 @@ export function RequestDetailPage() {
       amendRequest(request.id, amendUrgency);
       setAmendOpen(false);
       notifications.show({
-        title: 'Ø³Ø·Ø­ ÙÙˆØ±ÛŒØª Ø§ØµÙ„Ø§Ø­ Ø´Ø¯',
-        message: `ÙÙˆØ±ÛŒØª Ø¬Ø¯ÛŒØ¯: ${URGENCY_LABELS[amendUrgency]}`,
+        title: 'سطح فوریت اصلاح شد',
+        message: `فوریت جدید: ${URGENCY_LABELS[amendUrgency]}`,
         color: 'green',
       });
     } catch (error) {
@@ -176,47 +176,47 @@ export function RequestDetailPage() {
     try {
       await navigator.clipboard.writeText(request.idempotency_key);
       notifications.show({
-        title: 'Ú©Ù„ÛŒØ¯ Ú©Ù¾ÛŒ Ø´Ø¯',
-        message: 'Idempotency-Key Ø¯Ø± Ú©Ù„ÛŒÙ¾â€ŒØ¨ÙˆØ±Ø¯ Ù‚Ø±Ø§Ø± Ú¯Ø±ÙØª.',
+        title: 'کلید کپی شد',
+        message: 'Idempotency-Key در کلیپ‌بورد قرار گرفت.',
         color: 'green',
         icon: <Copy size={16} />,
       });
     } catch {
       notifications.show({
-        title: 'Ú©Ù¾ÛŒ Ø§Ù†Ø¬Ø§Ù… Ù†Ø´Ø¯',
-        message: 'Ù…Ø±ÙˆØ±Ú¯Ø± Ø§Ø¬Ø§Ø²Ù‡ Ø¯Ø³ØªØ±Ø³ÛŒ Ø¨Ù‡ Ú©Ù„ÛŒÙ¾â€ŒØ¨ÙˆØ±Ø¯ Ø±Ø§ Ù†Ø¯Ø§Ø¯.',
+        title: 'کپی انجام نشد',
+        message: 'مرورگر اجازه دسترسی به کلیپ‌بورد را نداد.',
         color: 'orange',
       });
     }
   };
 
   const counterRows = [
-    { label: 'needed â€” Ù…Ù‚Ø¯Ø§Ø± Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ', value: request.counters.needed, color: 'brand' },
-    { label: 'confirmed â€” Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª', value: request.counters.confirmed, color: 'cyan' },
-    { label: 'en_route â€” Ø¯Ø± Ù…Ø³ÛŒØ±', value: request.counters.en_route, color: 'indigo' },
-    { label: 'arrived â€” Ø±Ø³ÛŒØ¯Ù‡', value: request.counters.arrived, color: 'orange' },
-    { label: 'fulfilled â€” Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ', value: request.counters.fulfilled, color: 'green' },
+    { label: 'needed — مقدار درخواستی', value: request.counters.needed, color: 'brand' },
+    { label: 'confirmed — پذیرش دعوت', value: request.counters.confirmed, color: 'cyan' },
+    { label: 'en_route — در مسیر', value: request.counters.en_route, color: 'indigo' },
+    { label: 'arrived — رسیده', value: request.counters.arrived, color: 'orange' },
+    { label: 'fulfilled — اهدای واقعی', value: request.counters.fulfilled, color: 'green' },
   ];
 
   return (
     <Stack gap="lg">
       <PageHeader
-        eyebrow="Ø¬Ø²Ø¦ÛŒØ§Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª"
+        eyebrow="جزئیات درخواست"
         title={<span className="bn-mono bn-ltr">{request.id}</span>}
         description={
           <span>
-            {request.hospital_name} Â· {PRODUCT_LABELS[request.product]} Â· Ú¯Ø±ÙˆÙ‡{' '}
+            {request.hospital_name} · {PRODUCT_LABELS[request.product]} · گروه{' '}
             <span className="bn-ltr">{request.blood_group}</span>
           </span>
         }
         actions={
           <>
             <Button component={Link} to="/requests" variant="default" leftSection={<ArrowRight size={16} />}>
-              ÙÙ‡Ø±Ø³Øª
+              فهرست
             </Button>
             {request.state === 'pending_review' && (
               <Button color="green" onClick={handleApprove} leftSection={<CheckCircle size={16} />}>
-                ØªØ£ÛŒÛŒØ¯ Ø¯Ø±Ø®ÙˆØ§Ø³Øª
+                تأیید درخواست
               </Button>
             )}
             {!terminal && (
@@ -226,7 +226,7 @@ export function RequestDetailPage() {
                   to={`/inventory?request=${request.id}`}
                   leftSection={<Truck size={16} />}
                 >
-                  ØªØ®ØµÛŒØµ Ù…ÙˆØ¬ÙˆØ¯ÛŒ
+                  تخصیص موجودی
                 </Button>
                 <Button
                   variant="default"
@@ -236,7 +236,7 @@ export function RequestDetailPage() {
                     setAmendOpen(true);
                   }}
                 >
-                  Ø§ØµÙ„Ø§Ø­ ÙÙˆØ±ÛŒØª
+                  اصلاح فوریت
                 </Button>
                 <Button
                   variant="subtle"
@@ -244,7 +244,7 @@ export function RequestDetailPage() {
                   leftSection={<Prohibit size={16} />}
                   onClick={() => setCancelOpen(true)}
                 >
-                  Ù„ØºÙˆ
+                  لغو
                 </Button>
               </>
             )}
@@ -262,44 +262,44 @@ export function RequestDetailPage() {
         </Badge>
       </Group>
 
-      <InlineMessage tone={request.supplied_units > 0 ? 'warning' : 'info'} title="ØªØ£Ù…ÛŒÙ† ÙˆØ§Ù‚Ø¹ÛŒ Ø¨Ø§ ØªØ®ØµÛŒØµ ÛŒØ§ Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª Ø¨Ø±Ø§Ø¨Ø± Ù†ÛŒØ³Øª">
-        Â«Ù…Ù‚Ø¯Ø§Ø± ÙˆØ§Ù‚Ø¹Ø§Ù‹ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡Â» ÙÙ‚Ø· Ø¨Ø§ Ø±ÙˆÛŒØ¯Ø§Ø¯ <span className="bn-mono bn-ltr">donated</span> Ø§ÙØ²Ø§ÛŒØ´ Ù…ÛŒâ€ŒÛŒØ§Ø¨Ø¯.
-        Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØªØŒ Ø­Ø±Ú©Øª Ø¨Ù‡ Ù…Ø±Ú©Ø²ØŒ Ø±Ø³ÛŒØ¯Ù†ØŒ Ù‚Ø¨ÙˆÙ„ÛŒ ØºØ±Ø¨Ø§Ù„Ú¯Ø±ÛŒ ÛŒØ§ ØªØ®ØµÛŒØµ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù‡ÛŒÚ†â€ŒÚ©Ø¯Ø§Ù… Ø§Ù‡Ø¯Ø§ Ù…Ø­Ø³ÙˆØ¨ Ù†Ù…ÛŒâ€ŒØ´ÙˆÙ†Ø¯.
+      <InlineMessage tone={request.supplied_units > 0 ? 'warning' : 'info'} title="تأمین واقعی با تخصیص یا پذیرش دعوت برابر نیست">
+        «مقدار واقعاً تأمین‌شده» فقط با رویداد <span className="bn-mono bn-ltr">donated</span> افزایش می‌یابد.
+        پذیرش دعوت، حرکت به مرکز، رسیدن، قبولی غربالگری یا تخصیص موجودی هیچ‌کدام اهدا محسوب نمی‌شوند.
       </InlineMessage>
 
       <SimpleGrid cols={{ base: 1, xs: 2, md: 5 }} spacing="md">
         <StatCard
-          label="Ù…Ù‚Ø¯Ø§Ø± Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ"
+          label="مقدار درخواستی"
           value={formatNumber(request.units)}
-          hint="ÙÛŒÙ„Ø¯ units Ø¯Ø± Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯"
+          hint="فیلد units در قرارداد"
           icon={<ClipboardText size={21} weight="duotone" />}
           color="brand"
         />
         <StatCard
-          label="Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø³Ø§Ø²Ú¯Ø§Ø± Ù‚Ø§Ø¨Ù„ ØªØ®ØµÛŒØµ"
+          label="موجودی سازگار قابل تخصیص"
           value={formatNumber(compatibleUnits)}
-          hint="Ù…ÙˆØ¬ÙˆØ¯ÛŒ ÙØ¹Ù„ÛŒ Ø¨Ø§ Ù…Ø§ØªØ±ÛŒØ³ Ø±Ø³Ù…ÛŒ"
+          hint="موجودی فعلی با ماتریس رسمی"
           icon={<Drop size={21} weight="duotone" />}
           color="cyan"
         />
         <StatCard
-          label="Ù…Ù‚Ø¯Ø§Ø± ØªØ®ØµÛŒØµâ€ŒÛŒØ§ÙØªÙ‡"
+          label="مقدار تخصیص‌یافته"
           value={formatNumber(request.allocated_units)}
-          hint="ØªØ®ØµÛŒØµ Ù…ÙˆØ¬ÙˆØ¯ÛŒØ› Ù‡Ù†ÙˆØ² Ø§Ù‡Ø¯Ø§ Ù†ÛŒØ³Øª"
+          hint="تخصیص موجودی؛ هنوز اهدا نیست"
           icon={<Truck size={21} weight="duotone" />}
           color="indigo"
         />
         <StatCard
-          label="Ù…Ù‚Ø¯Ø§Ø± ÙˆØ§Ù‚Ø¹Ø§Ù‹ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡"
+          label="مقدار واقعاً تأمین‌شده"
           value={formatNumber(request.supplied_units)}
-          hint="ÙÙ‚Ø· Ø±ÙˆÛŒØ¯Ø§Ø¯ donated"
+          hint="فقط رویداد donated"
           icon={<FirstAidKit size={21} weight="duotone" />}
           color="green"
         />
         <StatCard
-          label="Ù…Ù‚Ø¯Ø§Ø± Ø¨Ø§Ù‚ÛŒâ€ŒÙ…Ø§Ù†Ø¯Ù‡"
+          label="مقدار باقی‌مانده"
           value={formatNumber(remaining)}
-          hint="Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ Ù…Ù†Ù‡Ø§ÛŒ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡"
+          hint="درخواستی منهای تأمین‌شده"
           icon={<Heartbeat size={21} weight="duotone" />}
           color={remaining > 0 ? 'crimson' : 'green'}
         />
@@ -308,29 +308,29 @@ export function RequestDetailPage() {
       <Grid gap="lg">
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <Stack gap="lg">
-            <SectionCard title="ÙˆØ¶Ø¹ÛŒØª Ø±Ø³Ù…ÛŒ Ùˆ Ø´Ù…Ø§Ø±Ù†Ø¯Ù‡â€ŒÙ‡Ø§" description={STATE_DESCRIPTIONS[request.state]}>
+            <SectionCard title="وضعیت رسمی و شمارنده‌ها" description={STATE_DESCRIPTIONS[request.state]}>
               <Stack gap="md">
                 <Group justify="space-between" align="flex-start" gap="sm" wrap="wrap">
                   <Group gap="sm">
                     <StateBadge state={request.state} size="lg" />
                     <Badge color={slaRemaining > 0 ? 'orange' : 'red'} variant="light" size="lg">
                       {slaRemaining > 0
-                        ? `${formatDuration(slaRemaining)} ØªØ§ Ù‡Ø¯Ù ${URGENCY_LABELS[request.urgency]}`
-                        : 'Ù…Ù‡Ù„Øª Ù‡Ø¯Ù Ú¯Ø°Ø´ØªÙ‡ Ø§Ø³Øª'}
+                        ? `${formatDuration(slaRemaining)} تا هدف ${URGENCY_LABELS[request.urgency]}`
+                        : 'مهلت هدف گذشته است'}
                     </Badge>
                   </Group>
                   <Text size="xs" c="dimmed">
-                    Ø¢Ø®Ø±ÛŒÙ† Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ: {formatRelative(request.updated_at, state.sim_time)}
+                    آخرین به‌روزرسانی: {formatRelative(request.updated_at, state.sim_time)}
                   </Text>
                 </Group>
 
                 <Box>
                   <Group justify="space-between" mb={6}>
                     <Text size="xs" c="dimmed">
-                      Ù¾ÛŒØ´Ø±ÙØª ØªØ£Ù…ÛŒÙ† ÙˆØ§Ù‚Ø¹ÛŒ
+                      پیشرفت تأمین واقعی
                     </Text>
                     <Text size="xs" fw={700} className="bn-number">
-                      {formatNumber(request.supplied_units)} / {formatNumber(request.units)} â€”{' '}
+                      {formatNumber(request.supplied_units)} / {formatNumber(request.units)} —{' '}
                       {formatPercent(request.supplied_units, request.units)}
                     </Text>
                   </Group>
@@ -339,7 +339,7 @@ export function RequestDetailPage() {
                     size={10}
                     radius="xl"
                     color={request.supplied_units >= request.units ? 'green' : 'brand'}
-                    aria-label="Ù¾ÛŒØ´Ø±ÙØª ØªØ£Ù…ÛŒÙ† ÙˆØ§Ù‚Ø¹ÛŒ"
+                    aria-label="پیشرفت تأمین واقعی"
                   />
                 </Box>
 
@@ -359,31 +359,31 @@ export function RequestDetailPage() {
                 </SimpleGrid>
 
                 <Text size="xs" c="dimmed" lh={1.8}>
-                  Ø´Ù…Ø§Ø±Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ <span className="bn-mono bn-ltr">RequestState</span> Ù…Ø³ØªÙ‚Ù„â€ŒØ§Ù†Ø¯Ø› Ù‡ÛŒÚ†â€ŒÚ©Ø¯Ø§Ù… Ø¨Ù‡â€ŒØªÙ†Ù‡Ø§ÛŒÛŒ
-                  Ø¨Ù‡â€ŒÙ…Ø¹Ù†Ø§ÛŒ Ù…ÙˆØ¬ÙˆØ¯ÛŒ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ù†ÛŒØ³Øª.
+                  شمارنده‌های <span className="bn-mono bn-ltr">RequestState</span> مستقل‌اند؛ هیچ‌کدام به‌تنهایی
+                  به‌معنای موجودی تأمین‌شده نیست.
                 </Text>
               </Stack>
             </SectionCard>
 
-            <SectionCard title="Ø§Ø·Ù„Ø§Ø¹Ø§Øª Ø«Ø¨Øªâ€ŒØ´Ø¯Ù‡" description="Ù…Ù‚Ø§Ø¯ÛŒØ± Ù…Ø·Ø§Ø¨Ù‚ Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯ Ø±Ø³Ù…ÛŒ">
+            <SectionCard title="اطلاعات ثبت‌شده" description="مقادیر مطابق قرارداد رسمی">
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                <InfoRow label="Ø¨ÛŒÙ…Ø§Ø±Ø³ØªØ§Ù†" value={request.hospital_name} />
+                <InfoRow label="بیمارستان" value={request.hospital_name} />
                 <InfoRow
-                  label="Ø´Ù†Ø§Ø³Ù‡ Ø¨ÛŒÙ…Ø§Ø±Ø³ØªØ§Ù†"
+                  label="شناسه بیمارستان"
                   value={<span className="bn-mono bn-ltr">{request.hospital_id}</span>}
                 />
-                <InfoRow label="ÙØ±Ø¢ÙˆØ±Ø¯Ù‡" value={PRODUCT_LABELS[request.product]} />
+                <InfoRow label="فرآورده" value={PRODUCT_LABELS[request.product]} />
                 <InfoRow
-                  label="Ú¯Ø±ÙˆÙ‡ Ø®ÙˆÙ†ÛŒ Ú¯ÛŒØ±Ù†Ø¯Ù‡"
+                  label="گروه خونی گیرنده"
                   value={<span className="bn-ltr">{request.blood_group}</span>}
                 />
-                <InfoRow label="ØªØ¹Ø¯Ø§Ø¯ ÙˆØ§Ø­Ø¯" value={formatNumber(request.units)} />
-                <InfoRow label="Ø³Ø·Ø­ ÙÙˆØ±ÛŒØª" value={URGENCY_LABELS[request.urgency]} />
-                <InfoRow label="Ø²Ù…Ø§Ù† Ø«Ø¨Øª" value={formatDateTime(request.created_at)} />
-                <InfoRow label="Ø¢Ø®Ø±ÛŒÙ† Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ" value={formatDateTime(request.updated_at)} />
+                <InfoRow label="تعداد واحد" value={formatNumber(request.units)} />
+                <InfoRow label="سطح فوریت" value={URGENCY_LABELS[request.urgency]} />
+                <InfoRow label="زمان ثبت" value={formatDateTime(request.created_at)} />
+                <InfoRow label="آخرین به‌روزرسانی" value={formatDateTime(request.updated_at)} />
                 <InfoRow
-                  label="ÛŒØ§Ø¯Ø¯Ø§Ø´Øª"
-                  value={request.note || 'Ø¨Ø¯ÙˆÙ† ÛŒØ§Ø¯Ø¯Ø§Ø´Øª'}
+                  label="یادداشت"
+                  value={request.note || 'بدون یادداشت'}
                   fullWidth
                 />
                 <InfoRow
@@ -399,7 +399,7 @@ export function RequestDetailPage() {
                         onClick={copyIdempotencyKey}
                         leftSection={<Copy size={13} />}
                       >
-                        Ú©Ù¾ÛŒ
+                        کپی
                       </Button>
                     </Group>
                   }
@@ -409,8 +409,8 @@ export function RequestDetailPage() {
             </SectionCard>
 
             <SectionCard
-              title="ØªØ®ØµÛŒØµâ€ŒÙ‡Ø§ÛŒ Ù…ÙˆØ¬ÙˆØ¯ÛŒ"
-              description={`${formatNumber(dispatches.length)} ØªØ®ØµÛŒØµ Ø«Ø¨Øªâ€ŒØ´Ø¯Ù‡ â€” FEFO Ùˆ ETA Ø´Ø¨ÛŒÙ‡â€ŒØ³Ø§Ø²ÛŒ`}
+              title="تخصیص‌های موجودی"
+              description={`${formatNumber(dispatches.length)} تخصیص ثبت‌شده — FEFO و ETA شبیه‌سازی`}
               action={
                 !terminal && (
                   <Button
@@ -420,7 +420,7 @@ export function RequestDetailPage() {
                     size="xs"
                     leftSection={<Truck size={14} />}
                   >
-                    ØªØ®ØµÛŒØµ Ø¬Ø¯ÛŒØ¯
+                    تخصیص جدید
                   </Button>
                 )
               }
@@ -431,13 +431,13 @@ export function RequestDetailPage() {
                   <Table verticalSpacing="sm" horizontalSpacing="md">
                     <Table.Thead>
                       <Table.Tr>
-                        <Table.Th>Ø´Ù†Ø§Ø³Ù‡</Table.Th>
-                        <Table.Th>Ù…Ø±Ú©Ø²</Table.Th>
-                        <Table.Th>Ú¯Ø±ÙˆÙ‡ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡</Table.Th>
-                        <Table.Th>ÙˆØ§Ø­Ø¯</Table.Th>
+                        <Table.Th>شناسه</Table.Th>
+                        <Table.Th>مرکز</Table.Th>
+                        <Table.Th>گروه اهداکننده</Table.Th>
+                        <Table.Th>واحد</Table.Th>
                         <Table.Th>ETA</Table.Th>
-                        <Table.Th>ÙˆØ¶Ø¹ÛŒØª</Table.Th>
-                        <Table.Th>Ø²Ù…Ø§Ù†</Table.Th>
+                        <Table.Th>وضعیت</Table.Th>
+                        <Table.Th>زمان</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -477,13 +477,13 @@ export function RequestDetailPage() {
                 </Table.ScrollContainer>
               ) : (
                 <EmptyState
-                  title="Ù‡Ù†ÙˆØ² Ù…ÙˆØ¬ÙˆØ¯ÛŒ ØªØ®ØµÛŒØµ Ù†ÛŒØ§ÙØªÙ‡"
-                  description="Ø§Ø² ØµÙØ­Ù‡ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù…Ø±Ø§Ú©Ø²ØŒ Ø±Ø¯ÛŒÙ Ø³Ø§Ø²Ú¯Ø§Ø± Ø¨Ø§ Ù†Ø²Ø¯ÛŒÚ©â€ŒØªØ±ÛŒÙ† Ø§Ù†Ù‚Ø¶Ø§ Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯."
+                  title="هنوز موجودی تخصیص نیافته"
+                  description="از صفحه موجودی مراکز، ردیف سازگار با نزدیک‌ترین انقضا را انتخاب کنید."
                   icon={<Truck size={24} />}
                   action={
                     !terminal && (
                       <Button component={Link} to={`/inventory?request=${request.id}`} leftSection={<Drop size={16} />}>
-                        Ø±ÙØªÙ† Ø¨Ù‡ Ù…ÙˆØ¬ÙˆØ¯ÛŒ
+                        رفتن به موجودی
                       </Button>
                     )
                   }
@@ -492,11 +492,11 @@ export function RequestDetailPage() {
             </SectionCard>
 
             <SectionCard
-              title="Ø¯Ø¹ÙˆØªâ€ŒÙ‡Ø§ÛŒ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡"
-              description={`${formatNumber(donors.length)} Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ù…Ø±ØªØ¨Ø· Ø¨Ø§ Ø§ÛŒÙ† Ø¯Ø±Ø®ÙˆØ§Ø³Øª`}
+              title="دعوت‌های اهداکننده"
+              description={`${formatNumber(donors.length)} اهداکننده مرتبط با این درخواست`}
               action={
                 <Button component={Link} to="/donor" variant="subtle" size="xs" leftSection={<UsersThree size={14} />}>
-                  Ù¾ÙˆØ±ØªØ§Ù„ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡
+                  پورتال اهداکننده
                 </Button>
               }
             >
@@ -513,7 +513,7 @@ export function RequestDetailPage() {
                             <BloodGroupBadge group={donor.blood_group} size="xs" />
                           </Group>
                           <Text size="xs" c="dimmed" mt={3}>
-                            {donor.center_name} Â· {formatNumber(1)} ÙˆØ§Ø­Ø¯ Â· {donor.phone_masked}
+                            {donor.center_name} · {formatNumber(1)} واحد · {donor.phone_masked}
                           </Text>
                         </Box>
                         <Group gap={6}>
@@ -523,10 +523,10 @@ export function RequestDetailPage() {
                       </Group>
                       <Group justify="space-between" mt={8}>
                         <Text size="xs" c="dimmed">
-                          Ø¢Ø®Ø±ÛŒÙ† Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ: {formatRelative(donor.updated_at, state.sim_time)}
+                          آخرین به‌روزرسانی: {formatRelative(donor.updated_at, state.sim_time)}
                         </Text>
                         <Button component={Link} to={`/donor?donor=${donor.id}`} variant="subtle" size="compact-xs">
-                          Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø¯Ø± Ù¾ÙˆØ±ØªØ§Ù„
+                          مشاهده در پورتال
                         </Button>
                       </Group>
                     </Box>
@@ -534,7 +534,7 @@ export function RequestDetailPage() {
                 </Stack>
               ) : (
                 <Text size="sm" c="dimmed" lh={1.8}>
-                  Ù‡Ù†ÙˆØ² Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡â€ŒØ§ÛŒ Ø¨Ø±Ø§ÛŒ Ø§ÛŒÙ† Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¯Ø¹ÙˆØª Ù†Ø´Ø¯Ù‡ Ø§Ø³Øª. Ø¯Ø¹ÙˆØª Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ù…ÙˆØ¬ÙˆØ¯ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ø§ÛŒØ¬Ø§Ø¯ Ù†Ù…ÛŒâ€ŒÚ©Ù†Ø¯.
+                  هنوز اهداکننده‌ای برای این درخواست دعوت نشده است. دعوت اهداکننده موجودی واقعی ایجاد نمی‌کند.
                 </Text>
               )}
             </SectionCard>
@@ -543,16 +543,16 @@ export function RequestDetailPage() {
 
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <Stack gap="lg">
-            <SectionCard title="Ø§Ù‚Ø¯Ø§Ù…â€ŒÙ‡Ø§ÛŒ Ù…Ø¬Ø§Ø²" description="Ø¨Ø± Ø§Ø³Ø§Ø³ ÙˆØ¶Ø¹ÛŒØª Ø±Ø³Ù…ÛŒ Ùˆ Ù†Ù‚Ø´ Ù†Ù…Ø§ÛŒØ´ÛŒ">
+            <SectionCard title="اقدام‌های مجاز" description="بر اساس وضعیت رسمی و نقش نمایشی">
               <Stack gap="xs">
                 {request.state === 'pending_review' ? (
                   <Button color="green" fullWidth leftSection={<CheckCircle size={17} />} onClick={handleApprove}>
-                    ØªØ£ÛŒÛŒØ¯ Ø¯Ø±Ø®ÙˆØ§Ø³Øª
+                    تأیید درخواست
                   </Button>
                 ) : (
                   <Text size="xs" c="dimmed" lh={1.8}>
-                    ØªØ£ÛŒÛŒØ¯ ÙÙ‚Ø· Ø¨Ø±Ø§ÛŒ Ø¯Ø±Ø®ÙˆØ§Ø³Øª <span className="bn-mono bn-ltr">pending_review</span> Ùˆ Ø¨Ø§ ØªÙˆÚ©Ù†
-                    Ù‡Ù…Ø§Ù‡Ù†Ú¯â€ŒÚ©Ù†Ù†Ø¯Ù‡ Ù…Ø¬Ø§Ø² Ø§Ø³Øª.
+                    تأیید فقط برای درخواست <span className="bn-mono bn-ltr">pending_review</span> و با توکن
+                    هماهنگ‌کننده مجاز است.
                   </Text>
                 )}
 
@@ -565,7 +565,7 @@ export function RequestDetailPage() {
                       fullWidth
                       leftSection={<Truck size={17} />}
                     >
-                      ØªØ®ØµÛŒØµ Ù…ÙˆØ¬ÙˆØ¯ÛŒ
+                      تخصیص موجودی
                     </Button>
                     <Button
                       variant="default"
@@ -576,7 +576,7 @@ export function RequestDetailPage() {
                         setAmendOpen(true);
                       }}
                     >
-                      Ø§ØµÙ„Ø§Ø­ ÙÙˆØ±ÛŒØª
+                      اصلاح فوریت
                     </Button>
                     <Button
                       variant="subtle"
@@ -585,45 +585,45 @@ export function RequestDetailPage() {
                       leftSection={<Prohibit size={17} />}
                       onClick={() => setCancelOpen(true)}
                     >
-                      Ù„ØºÙˆ Ø¯Ø±Ø®ÙˆØ§Ø³Øª
+                      لغو درخواست
                     </Button>
                   </>
                 ) : (
-                  <InlineMessage tone="info" title="Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¯Ø± ÙˆØ¶Ø¹ÛŒØª Ù†Ù‡Ø§ÛŒÛŒ Ø§Ø³Øª">
-                    Ø¯Ø± ÙˆØ¶Ø¹ÛŒØª <span className="bn-mono bn-ltr">{request.state}</span> Ø§Ù…Ú©Ø§Ù† Ù„ØºÙˆØŒ Ø§ØµÙ„Ø§Ø­ ÛŒØ§ ØªØ®ØµÛŒØµ
-                    Ø¬Ø¯ÛŒØ¯ ÙˆØ¬ÙˆØ¯ Ù†Ø¯Ø§Ø±Ø¯.
+                  <InlineMessage tone="info" title="درخواست در وضعیت نهایی است">
+                    در وضعیت <span className="bn-mono bn-ltr">{request.state}</span> امکان لغو، اصلاح یا تخصیص
+                    جدید وجود ندارد.
                   </InlineMessage>
                 )}
               </Stack>
             </SectionCard>
 
-            <SectionCard title="Ø®Ù„Ø§ØµÙ‡ Ø¹Ù…Ù„ÛŒØ§Øª">
+            <SectionCard title="خلاصه عملیات">
               <Stack gap="sm">
-                <SummaryRow icon={<MapPin size={16} />} label="Ø¨ÛŒÙ…Ø§Ø±Ø³ØªØ§Ù†" value={request.hospital_name} />
+                <SummaryRow icon={<MapPin size={16} />} label="بیمارستان" value={request.hospital_name} />
                 <SummaryRow
                   icon={<Siren size={16} />}
-                  label="ÙÙˆØ±ÛŒØª"
-                  value={`${URGENCY_LABELS[request.urgency]} â€” Ù‡Ø¯Ù ${formatDuration(slaMinutes)}`}
+                  label="فوریت"
+                  value={`${URGENCY_LABELS[request.urgency]} — هدف ${formatDuration(slaMinutes)}`}
                 />
                 <SummaryRow
                   icon={<Clock size={16} />}
-                  label="Ø²Ù…Ø§Ù† Ø³Ù¾Ø±ÛŒâ€ŒØ´Ø¯Ù‡"
+                  label="زمان سپری‌شده"
                   value={formatDuration(elapsedMinutes)}
                 />
                 <SummaryRow
                   icon={<Drop size={16} />}
-                  label="Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø³Ø§Ø²Ú¯Ø§Ø±"
-                  value={`${formatNumber(compatibleUnits)} ÙˆØ§Ø­Ø¯`}
+                  label="موجودی سازگار"
+                  value={`${formatNumber(compatibleUnits)} واحد`}
                 />
                 <SummaryRow
                   icon={<FirstAidKit size={16} />}
-                  label="ØªØ£Ù…ÛŒÙ† ÙˆØ§Ù‚Ø¹ÛŒ"
-                  value={`${formatNumber(request.supplied_units)} Ø§Ø² ${formatNumber(request.units)} ÙˆØ§Ø­Ø¯`}
+                  label="تأمین واقعی"
+                  value={`${formatNumber(request.supplied_units)} از ${formatNumber(request.units)} واحد`}
                 />
               </Stack>
             </SectionCard>
 
-            <SectionCard title="ØªØ§ÛŒÙ…â€ŒÙ„Ø§ÛŒÙ† Ø±ÙˆÛŒØ¯Ø§Ø¯Ù‡Ø§" description="Ø¢Ø®Ø±ÛŒÙ† Û±Û° Ø±ÙˆÛŒØ¯Ø§Ø¯ Ù…Ø±ØªØ¨Ø· Ø¨Ø§ Ø¯Ø±Ø®ÙˆØ§Ø³Øª">
+            <SectionCard title="تایم‌لاین رویدادها" description="آخرین ۱۰ رویداد مرتبط با درخواست">
               {events.length > 0 ? (
                 <Box className="bn-timeline-line">
                   <Stack gap="md">
@@ -642,7 +642,7 @@ export function RequestDetailPage() {
                             {event.summary}
                           </Text>
                           <Text size="xs" c="dimmed" lh={1.5} mt={2}>
-                            {formatDateTime(event.at)} Â· {event.actor}
+                            {formatDateTime(event.at)} · {event.actor}
                           </Text>
                         </Box>
                       </Group>
@@ -651,47 +651,47 @@ export function RequestDetailPage() {
                 </Box>
               ) : (
                 <Text size="sm" c="dimmed" lh={1.8}>
-                  Ø±ÙˆÛŒØ¯Ø§Ø¯ÛŒ Ø¨Ø±Ø§ÛŒ Ø§ÛŒÙ† Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø«Ø¨Øª Ù†Ø´Ø¯Ù‡ Ø§Ø³Øª.
+                  رویدادی برای این درخواست ثبت نشده است.
                 </Text>
               )}
             </SectionCard>
 
-            <InlineMessage tone="warning" title="ÛŒØ§Ø¯Ø¢ÙˆØ±ÛŒ Ø¯Ø§Ù…Ù†Ù‡">
-              Ø§ÛŒÙ† Ø¯Ø§Ø¯Ù‡ Ø³Ø§Ø®ØªÚ¯ÛŒ Ø§Ø³Øª Ùˆ Ø±Ø§Ù‡Ù†Ù…Ø§ÛŒ Ø¨Ø§Ù„ÛŒÙ†ÛŒ Ù†ÛŒØ³Øª. Ø¨Ø±Ø§ÛŒ ØªØµÙ…ÛŒÙ… ÙˆØ§Ù‚Ø¹ÛŒØŒ Ø¨Ù‡ Ø³Ø§Ù…Ø§Ù†Ù‡ Ø±Ø³Ù…ÛŒ Ùˆ Ù…Ø§ØªØ±ÛŒØ³ Ø³Ø§Ø²Ú¯Ø§Ø±ÛŒ
-              Ù…Ø¹ØªØ¨Ø± Ù…Ø±Ø§Ø¬Ø¹Ù‡ Ú©Ù†ÛŒØ¯.
+            <InlineMessage tone="warning" title="یادآوری دامنه">
+              این داده ساختگی است و راهنمای بالینی نیست. برای تصمیم واقعی، به سامانه رسمی و ماتریس سازگاری
+              معتبر مراجعه کنید.
             </InlineMessage>
           </Stack>
         </Grid.Col>
       </Grid>
 
-      <Modal opened={cancelOpen} onClose={() => setCancelOpen(false)} title="Ù„ØºÙˆ Ø¯Ø±Ø®ÙˆØ§Ø³Øª" centered>
+      <Modal opened={cancelOpen} onClose={() => setCancelOpen(false)} title="لغو درخواست" centered>
         <Stack gap="md">
           <Text size="sm" lh={1.8}>
-            Ø¢ÛŒØ§ Ø§Ø² Ù„ØºÙˆ Ø¯Ø±Ø®ÙˆØ§Ø³Øª <span className="bn-mono bn-ltr">{request.id}</span> Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ Ø¯Ø± Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯ ÙˆØ§Ù‚Ø¹ÛŒ
-            Ù„ØºÙˆ ØªÚ©Ø±Ø§Ø±ÛŒ Ù¾Ø§Ø³Ø® Ø¨Ø¯ÙˆÙ† ØªØºÛŒÛŒØ± Ù…ÛŒâ€ŒØ¯Ù‡Ø¯Ø› Ø¯Ø± Ø§ÛŒÙ† Ù†Ù…Ø§ÛŒØ´ØŒ ÙˆØ¶Ø¹ÛŒØª Ø¨Ù‡ cancelled ØªØºÛŒÛŒØ± Ù…ÛŒâ€ŒÚ©Ù†Ø¯.
+            آیا از لغو درخواست <span className="bn-mono bn-ltr">{request.id}</span> مطمئن هستید؟ در قرارداد واقعی
+            لغو تکراری پاسخ بدون تغییر می‌دهد؛ در این نمایش، وضعیت به cancelled تغییر می‌کند.
           </Text>
-          <InlineMessage tone="warning" title="Ù„ØºÙˆ Ø¨Ù‡â€ŒÙ…Ø¹Ù†Ø§ÛŒ Ø¨Ø§Ø²Ú¯Ø´Øª Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù†ÛŒØ³Øª">
-            Ø§ÛŒÙ† Ø¹Ù…Ù„ÛŒØ§Øª Ù†Ù…Ø§ÛŒØ´ÛŒ Ù…ÙˆØ¬ÙˆØ¯ÛŒ ØªØ®ØµÛŒØµâ€ŒÛŒØ§ÙØªÙ‡ Ø±Ø§ Ø¨Ø±Ù†Ù…ÛŒâ€ŒÚ¯Ø±Ø¯Ø§Ù†Ø¯ Ùˆ ÙÙ‚Ø· ÙˆØ¶Ø¹ÛŒØª Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø±Ø§ ØªØºÛŒÛŒØ± Ù…ÛŒâ€ŒØ¯Ù‡Ø¯.
+          <InlineMessage tone="warning" title="لغو به‌معنای بازگشت موجودی نیست">
+            این عملیات نمایشی موجودی تخصیص‌یافته را برنمی‌گرداند و فقط وضعیت درخواست را تغییر می‌دهد.
           </InlineMessage>
           <Group justify="flex-end" gap="sm">
             <Button variant="default" onClick={() => setCancelOpen(false)}>
-              Ø§Ù†ØµØ±Ø§Ù
+              انصراف
             </Button>
             <Button color="crimson" onClick={handleCancel} leftSection={<Prohibit size={16} />}>
-              Ù„ØºÙˆ Ú©Ù†
+              لغو کن
             </Button>
           </Group>
         </Stack>
       </Modal>
 
-      <Modal opened={amendOpen} onClose={() => setAmendOpen(false)} title="Ø§ØµÙ„Ø§Ø­ Ø³Ø·Ø­ ÙÙˆØ±ÛŒØª" centered>
+      <Modal opened={amendOpen} onClose={() => setAmendOpen(false)} title="اصلاح سطح فوریت" centered>
         <Stack gap="md">
           <Text size="sm" lh={1.8}>
-            Ø¯Ø± Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯ Ø±Ø³Ù…ÛŒØŒ Ø¨Ø¯Ù†Ù‡ Ø§ØµÙ„Ø§Ø­ ÙÙ‚Ø· ÙÛŒÙ„Ø¯ <span className="bn-mono bn-ltr">urgency</span> Ø±Ø§ Ù…ÛŒâ€ŒÙ¾Ø°ÛŒØ±Ø¯.
+            در قرارداد رسمی، بدنه اصلاح فقط فیلد <span className="bn-mono bn-ltr">urgency</span> را می‌پذیرد.
           </Text>
           <Box>
             <Text size="sm" fw={600} mb={6}>
-              Ø³Ø·Ø­ ÙÙˆØ±ÛŒØª Ø¬Ø¯ÛŒØ¯
+              سطح فوریت جدید
             </Text>
             <SegmentedControl
               fullWidth
@@ -703,15 +703,15 @@ export function RequestDetailPage() {
               }))}
             />
             <Text size="xs" c="dimmed" mt={6}>
-              Ù‡Ø¯Ù Ø²Ù…Ø§Ù†ÛŒ: {formatDuration(URGENCY_SLA_MINUTES[amendUrgency])}
+              هدف زمانی: {formatDuration(URGENCY_SLA_MINUTES[amendUrgency])}
             </Text>
           </Box>
           <Group justify="flex-end" gap="sm">
             <Button variant="default" onClick={() => setAmendOpen(false)}>
-              Ø§Ù†ØµØ±Ø§Ù
+              انصراف
             </Button>
             <Button color="brand" onClick={handleAmend}>
-              Ø«Ø¨Øª Ø§ØµÙ„Ø§Ø­
+              ثبت اصلاح
             </Button>
           </Group>
         </Stack>
@@ -748,4 +748,3 @@ function SummaryRow({ icon, label, value }: { icon: ReactNode; label: string; va
     </Group>
   );
 }
-

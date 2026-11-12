@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Box, Button, Group, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { ArrowRight, MagnifyingGlass, WarningCircle } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
@@ -39,7 +39,7 @@ interface ErrorStateProps {
   action?: ReactNode;
 }
 
-export function ErrorState({ code = 'Ø®Ø·Ø§', title, description, action }: ErrorStateProps) {
+export function ErrorState({ code = 'خطا', title, description, action }: ErrorStateProps) {
   return (
     <Paper className="bn-card" p="xl">
       <Stack align="center" gap="sm" ta="center" maw={520} mx="auto">
@@ -64,7 +64,7 @@ export function ErrorState({ code = 'Ø®Ø·Ø§', title, description, action }
             mt="xs"
             leftSection={<ArrowRight size={16} />}
           >
-            Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯
+            بازگشت به داشبورد
           </Button>
         )}
       </Stack>
@@ -112,4 +112,3 @@ export function InlineMessage({ title, children, tone = 'info' }: InlineMessageP
     </Box>
   );
 }
-

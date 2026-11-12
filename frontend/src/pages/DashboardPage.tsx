@@ -1,4 +1,4 @@
-﻿import { Badge, Box, Button, Grid, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Badge, Box, Button, Grid, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/core';
 import {
   ArrowLeft,
   Buildings,
@@ -84,9 +84,9 @@ export function DashboardPage() {
   return (
     <Stack gap="lg">
       <PageHeader
-        eyebrow="Ù†Ù…Ø§ÛŒ Ø¹Ù…Ù„ÛŒØ§Øª"
-        title="Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯ Ø´Ø¨Ú©Ù‡ Ø§Ù‡Ø¯Ø§ÛŒ Ø®ÙˆÙ†"
-        description="ØªØµÙˆÛŒØ± Ù„Ø­Ø¸Ù‡â€ŒØ§ÛŒ Ø§Ø² Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§ØŒ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø³Ø§Ø²Ú¯Ø§Ø±ØŒ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ú¯Ø§Ù† Ùˆ ÙˆØ¶Ø¹ÛŒØª Ø±Ø³Ù…ÛŒ ØªØ£Ù…ÛŒÙ†. Ù‡Ù…Ù‡ Ø§Ø¹Ø¯Ø§Ø¯ Ø§Ø² Ø¯Ø§Ø¯Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ Ù‡Ù…ÛŒÙ† Ù…Ø±ÙˆØ±Ú¯Ø± Ù…ÛŒâ€ŒØ¢ÛŒÙ†Ø¯."
+        eyebrow="نمای عملیات"
+        title="داشبورد شبکه اهدای خون"
+        description="تصویر لحظه‌ای از درخواست‌ها، موجودی سازگار، اهداکنندگان و وضعیت رسمی تأمین. همه اعداد از داده نمایشی همین مرورگر می‌آیند."
         actions={
           <>
             <Button
@@ -95,7 +95,7 @@ export function DashboardPage() {
               leftSection={<Plus size={17} weight="bold" />}
               color="brand"
             >
-              Ø«Ø¨Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª
+              ثبت درخواست
             </Button>
             <Button
               component={Link}
@@ -103,7 +103,7 @@ export function DashboardPage() {
               variant="default"
               leftSection={<Drop size={17} weight="fill" />}
             >
-              Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù…Ø±Ø§Ú©Ø²
+              موجودی مراکز
             </Button>
           </>
         }
@@ -111,37 +111,37 @@ export function DashboardPage() {
 
       <SimpleGrid cols={{ base: 1, xs: 2, md: 3, xl: 5 }} spacing="md">
         <StatCard
-          label="Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§ÛŒ ÙØ¹Ø§Ù„"
+          label="درخواست‌های فعال"
           value={formatNumber(activeRequestCount(state))}
-          hint={`${formatNumber(criticalRequests.length)} Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¨Ø­Ø±Ø§Ù†ÛŒ Ø¯Ø± Ø¬Ø±ÛŒØ§Ù†`}
+          hint={`${formatNumber(criticalRequests.length)} درخواست بحرانی در جریان`}
           icon={<ClipboardText size={21} weight="duotone" />}
           color="brand"
         />
         <StatCard
-          label="ÙˆØ§Ø­Ø¯ Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ ÙØ¹Ø§Ù„"
+          label="واحد درخواستی فعال"
           value={formatNumber(neededUnits)}
-          hint="Ù…Ø¬Ù…ÙˆØ¹ Ù…Ù‚Ø¯Ø§Ø± Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒØŒ Ù†Ù‡ Ù…Ù‚Ø¯Ø§Ø± ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡"
+          hint="مجموع مقدار درخواستی، نه مقدار تأمین‌شده"
           icon={<Heartbeat size={21} weight="duotone" />}
           color="crimson"
         />
         <StatCard
-          label="Ù…Ù‚Ø¯Ø§Ø± ØªØ®ØµÛŒØµâ€ŒÛŒØ§ÙØªÙ‡"
+          label="مقدار تخصیص‌یافته"
           value={formatNumber(allocatedUnits)}
-          hint="ØªØ®ØµÛŒØµ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù‡Ù†ÙˆØ² Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ù†ÛŒØ³Øª"
+          hint="تخصیص موجودی هنوز اهدای واقعی نیست"
           icon={<Drop size={21} weight="duotone" />}
           color="cyan"
         />
         <StatCard
-          label="Ù…Ù‚Ø¯Ø§Ø± ÙˆØ§Ù‚Ø¹Ø§Ù‹ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡"
+          label="مقدار واقعاً تأمین‌شده"
           value={formatNumber(suppliedUnits)}
-          hint="ÙÙ‚Ø· Ø±ÙˆÛŒØ¯Ø§Ø¯ donated Ø§ÛŒÙ† Ø¹Ø¯Ø¯ Ø±Ø§ Ø§ÙØ²Ø§ÛŒØ´ Ù…ÛŒâ€ŒØ¯Ù‡Ø¯"
+          hint="فقط رویداد donated این عدد را افزایش می‌دهد"
           icon={<FirstAidKit size={21} weight="duotone" />}
           color="green"
         />
         <StatCard
-          label="Ø¯Ø¹ÙˆØªâ€ŒÙ‡Ø§ÛŒ Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ù¾Ø§Ø³Ø®"
+          label="دعوت‌های در انتظار پاسخ"
           value={formatNumber(invitedDonors)}
-          hint={`${formatNumber(state.donors.length)} Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ø¯Ø± Ù†Ù…ÙˆÙ†Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ`}
+          hint={`${formatNumber(state.donors.length)} اهداکننده در نمونه نمایشی`}
           icon={<UsersThree size={21} weight="duotone" />}
           color="orange"
         />
@@ -154,19 +154,19 @@ export function DashboardPage() {
               title={
                 <Group gap="xs" wrap="nowrap">
                   <Siren size={20} color="#C2413A" weight="fill" aria-hidden="true" />
-                  <span>Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§ÛŒ Ø¨Ø­Ø±Ø§Ù†ÛŒ</span>
+                  <span>درخواست‌های بحرانی</span>
                 </Group>
               }
-              description="Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§ÛŒ ÙØ¹Ø§Ù„ Ø¨Ø§ ÙÙˆØ±ÛŒØª Ø¨Ø­Ø±Ø§Ù†ÛŒØ› Ù…Ù‡Ù„Øª Ù‡Ø¯Ù Û¹Û° Ø¯Ù‚ÛŒÙ‚Ù‡ Ø§Ø² Ø²Ù…Ø§Ù† Ø«Ø¨Øª Ø§Ø³Øª."
+              description="درخواست‌های فعال با فوریت بحرانی؛ مهلت هدف ۹۰ دقیقه از زمان ثبت است."
               action={
                 <Button component={Link} to="/requests" variant="subtle" size="xs" rightSection={<ArrowLeft size={14} />}>
-                  Ù‡Ù…Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§
+                  همه درخواست‌ها
                 </Button>
               }
             >
               {criticalRequests.length === 0 ? (
-                <InlineMessage tone="success" title="Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¨Ø­Ø±Ø§Ù†ÛŒ ÙØ¹Ø§Ù„ÛŒ ÙˆØ¬ÙˆØ¯ Ù†Ø¯Ø§Ø±Ø¯">
-                  Ø´Ø¨Ú©Ù‡ Ø¯Ø± Ø§ÛŒÙ† Ù„Ø­Ø¸Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¨Ø­Ø±Ø§Ù†ÛŒ Ø¨Ø¯ÙˆÙ† ØªØ£Ù…ÛŒÙ† Ù†Ø¯Ø§Ø±Ø¯Ø› Ø¨Ø§ Ø§ÛŒÙ† Ø­Ø§Ù„ ÙˆØ¶Ø¹ÛŒØª Ø±Ø§ Ø¨Ù‡â€ŒØµÙˆØ±Øª Ø²Ù†Ø¯Ù‡ Ù¾ÛŒÚ¯ÛŒØ±ÛŒ Ú©Ù†ÛŒØ¯.
+                <InlineMessage tone="success" title="درخواست بحرانی فعالی وجود ندارد">
+                  شبکه در این لحظه درخواست بحرانی بدون تأمین ندارد؛ با این حال وضعیت را به‌صورت زنده پیگیری کنید.
                 </InlineMessage>
               ) : (
                 <Stack gap="sm">
@@ -196,13 +196,13 @@ export function DashboardPage() {
                             {request.hospital_name}
                           </Text>
                           <Text size="xs" c="dimmed" mt={2}>
-                            {PRODUCT_LABELS[request.product]} Â· Ú¯Ø±ÙˆÙ‡ <span className="bn-ltr">{request.blood_group}</span> Â·{' '}
-                            {formatRelative(request.created_at, state.sim_time)} Ø«Ø¨Øª Ø´Ø¯Ù‡
+                            {PRODUCT_LABELS[request.product]} · گروه <span className="bn-ltr">{request.blood_group}</span> ·{' '}
+                            {formatRelative(request.created_at, state.sim_time)} ثبت شده
                           </Text>
                         </Box>
                         <Stack gap={4} align="flex-end">
                           <Text size="sm" fw={800} className="bn-number">
-                            {formatNumber(request.supplied_units)} Ø§Ø² {formatNumber(request.units)} ÙˆØ§Ø­Ø¯
+                            {formatNumber(request.supplied_units)} از {formatNumber(request.units)} واحد
                           </Text>
                           <Progress
                             value={clampPercent(request.supplied_units, request.units)}
@@ -210,10 +210,10 @@ export function DashboardPage() {
                             radius="xl"
                             color="crimson"
                             w={130}
-                            aria-label={`Ù¾ÛŒØ´Ø±ÙØª ØªØ£Ù…ÛŒÙ† ${request.id}`}
+                            aria-label={`پیشرفت تأمین ${request.id}`}
                           />
                           <Text size="xs" c="dimmed">
-                            Ù‡Ø¯Ù: {formatNumber(URGENCY_SLA_MINUTES.critical)} Ø¯Ù‚ÛŒÙ‚Ù‡
+                            هدف: {formatNumber(URGENCY_SLA_MINUTES.critical)} دقیقه
                           </Text>
                         </Stack>
                       </Group>
@@ -226,8 +226,8 @@ export function DashboardPage() {
             <Grid gap="lg">
               <Grid.Col span={{ base: 12, md: 6 }}>
                 <SectionCard
-                  title="ØªØ±Ú©ÛŒØ¨ ÙØ±Ø¢ÙˆØ±Ø¯Ù‡â€ŒÙ‡Ø§"
-                  description="Ù…Ø¬Ù…ÙˆØ¹ ÙˆØ§Ø­Ø¯ Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ Ø¯Ø± Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§ÛŒ ÙØ¹Ø§Ù„"
+                  title="ترکیب فرآورده‌ها"
+                  description="مجموع واحد درخواستی در درخواست‌های فعال"
                   className="h-full"
                 >
                   <Stack gap="md">
@@ -245,7 +245,7 @@ export function DashboardPage() {
                             </Text>
                           </Group>
                           <Text size="xs" c="dimmed" className="bn-number">
-                            {formatNumber(item.units)} ÙˆØ§Ø­Ø¯
+                            {formatNumber(item.units)} واحد
                           </Text>
                         </Group>
                         <Progress
@@ -253,7 +253,7 @@ export function DashboardPage() {
                           size={8}
                           radius="xl"
                           color={item.product === 'red_cells' ? 'crimson' : item.product === 'platelets' ? 'orange' : 'cyan'}
-                          aria-label={`Ø³Ù‡Ù… ${PRODUCT_LABELS[item.product]}`}
+                          aria-label={`سهم ${PRODUCT_LABELS[item.product]}`}
                         />
                       </Box>
                     ))}
@@ -263,8 +263,8 @@ export function DashboardPage() {
 
               <Grid.Col span={{ base: 12, md: 6 }}>
                 <SectionCard
-                  title="ØªÙˆØ²ÛŒØ¹ ÙˆØ¶Ø¹ÛŒØª Ø±Ø³Ù…ÛŒ"
-                  description="Ù‡ÙØª ÙˆØ¶Ø¹ÛŒØª Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯ÛŒØ› ÙˆØ¶Ø¹ÛŒØª Ù‡Ø± Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…Ø³ØªÙ‚Ù„ Ø§Ø² Ø±ÙˆÛŒØ¯Ø§Ø¯Ù‡Ø§ÛŒ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ø§Ø³Øª."
+                  title="توزیع وضعیت رسمی"
+                  description="هفت وضعیت قراردادی؛ وضعیت هر درخواست مستقل از رویدادهای اهداکننده است."
                   className="h-full"
                 >
                   <Stack gap={9}>
@@ -294,13 +294,13 @@ export function DashboardPage() {
 
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <Stack gap="lg">
-            <SectionCard title="Ø§Ù‚Ø¯Ø§Ù…â€ŒÙ‡Ø§ÛŒ Ø³Ø±ÛŒØ¹" description="Ù…Ø³ÛŒØ±Ù‡Ø§ÛŒ Ø§ØµÙ„ÛŒ Ø¹Ù…Ù„ÛŒØ§Øª">
+            <SectionCard title="اقدام‌های سریع" description="مسیرهای اصلی عملیات">
               <Stack gap="xs">
                 {[
-                  { to: '/requests/new', label: 'Ø«Ø¨Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¨ÛŒÙ…Ø§Ø±Ø³ØªØ§Ù†', icon: Plus, color: 'brand' },
-                  { to: '/inventory', label: 'ØªØ®ØµÛŒØµ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø¨Ø§ FEFO', icon: Drop, color: 'cyan' },
-                  { to: '/donor', label: 'Ù¾ÛŒÚ¯ÛŒØ±ÛŒ Ø¯Ø¹ÙˆØª Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡', icon: UsersThree, color: 'orange' },
-                  { to: '/audit', label: 'Ù…Ø´Ø§Ù‡Ø¯Ù‡ Audit Trail', icon: ChartBar, color: 'gray' },
+                  { to: '/requests/new', label: 'ثبت درخواست بیمارستان', icon: Plus, color: 'brand' },
+                  { to: '/inventory', label: 'تخصیص موجودی با FEFO', icon: Drop, color: 'cyan' },
+                  { to: '/donor', label: 'پیگیری دعوت اهداکننده', icon: UsersThree, color: 'orange' },
+                  { to: '/audit', label: 'مشاهده Audit Trail', icon: ChartBar, color: 'gray' },
                 ].map((item) => {
                   const IconComponent = item.icon;
                   return (
@@ -323,17 +323,17 @@ export function DashboardPage() {
             </SectionCard>
 
             <SectionCard
-              title="Ù‡Ø´Ø¯Ø§Ø± Ø§Ù†Ù‚Ø¶Ø§ÛŒ Ù…ÙˆØ¬ÙˆØ¯ÛŒ"
-              description={`${formatNumber(expiringItems.length)} Ø±Ø¯ÛŒÙ Ø¯Ø± Ù…Ø­Ø¯ÙˆØ¯Ù‡ Ú©Ù…ØªØ± Ø§Ø² Û¶ Ø³Ø§Ø¹Øª ÛŒØ§ Ù…Ù†Ù‚Ø¶ÛŒ`}
+              title="هشدار انقضای موجودی"
+              description={`${formatNumber(expiringItems.length)} ردیف در محدوده کمتر از ۶ ساعت یا منقضی`}
               action={
                 <Button component={Link} to="/inventory" variant="subtle" size="xs">
-                  Ù…Ø´Ø§Ù‡Ø¯Ù‡
+                  مشاهده
                 </Button>
               }
             >
               {expiringItems.length === 0 ? (
                 <Text size="sm" c="dimmed" lh={1.8}>
-                  Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù†Ø²Ø¯ÛŒÚ© Ø§Ù†Ù‚Ø¶Ø§ Ø¯Ø± Ù†Ù…ÙˆÙ†Ù‡ ÙØ¹Ù„ÛŒ ÙˆØ¬ÙˆØ¯ Ù†Ø¯Ø§Ø±Ø¯.
+                  موجودی نزدیک انقضا در نمونه فعلی وجود ندارد.
                 </Text>
               ) : (
                 <Stack gap="xs">
@@ -344,8 +344,8 @@ export function DashboardPage() {
                           {item.center_name}
                         </Text>
                         <Text size="xs" c="dimmed">
-                          <span className="bn-ltr">{item.blood_group}</span> Â· {PRODUCT_LABELS[item.product]} Â·{' '}
-                          {formatNumber(item.units)} ÙˆØ§Ø­Ø¯
+                          <span className="bn-ltr">{item.blood_group}</span> · {PRODUCT_LABELS[item.product]} ·{' '}
+                          {formatNumber(item.units)} واحد
                         </Text>
                       </Box>
                       <Badge
@@ -365,7 +365,7 @@ export function DashboardPage() {
               )}
             </SectionCard>
 
-            <SectionCard title="Ø¢Ù…Ø§Ø¯Ú¯ÛŒ Ù…Ø±Ø§Ú©Ø²" description="Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ú©Ù„ Ùˆ Ø±Ø¯ÛŒÙâ€ŒÙ‡Ø§ÛŒ Ù†Ø²Ø¯ÛŒÚ© Ø§Ù†Ù‚Ø¶Ø§">
+            <SectionCard title="آمادگی مراکز" description="موجودی کل و ردیف‌های نزدیک انقضا">
               <Stack gap="sm">
                 {CENTERS.map((center) => {
                   const items = state.inventory.filter((item) => item.center_id === center.id);
@@ -385,7 +385,7 @@ export function DashboardPage() {
                           </Text>
                         </Group>
                         <Text size="xs" c="dimmed" className="bn-number">
-                          {formatNumber(units)} ÙˆØ§Ø­Ø¯
+                          {formatNumber(units)} واحد
                         </Text>
                       </Group>
                       <Group justify="space-between" gap="xs">
@@ -395,11 +395,11 @@ export function DashboardPage() {
                           radius="xl"
                           color="brand"
                           className="flex-1"
-                          aria-label={`Ø³Ù‡Ù… Ù…ÙˆØ¬ÙˆØ¯ÛŒ ${center.name}`}
+                          aria-label={`سهم موجودی ${center.name}`}
                         />
                         {risky > 0 && (
                           <Badge color="orange" variant="light" size="xs">
-                            {formatNumber(risky)} Ù‡Ø´Ø¯Ø§Ø±
+                            {formatNumber(risky)} هشدار
                           </Badge>
                         )}
                       </Group>
@@ -413,11 +413,11 @@ export function DashboardPage() {
       </Grid>
 
       <SectionCard
-        title="Ø¢Ø®Ø±ÛŒÙ† Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§"
-        description={`Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒâ€ŒØ´Ø¯Ù‡ Ø¯Ø± ${formatDateTime(state.sim_time)} â€” Ø³Ø§Ø¹Øª Ø´Ø¨ÛŒÙ‡â€ŒØ³Ø§Ø²ÛŒ`}
+        title="آخرین درخواست‌ها"
+        description={`به‌روزرسانی‌شده در ${formatDateTime(state.sim_time)} — ساعت شبیه‌سازی`}
         action={
           <Button component={Link} to="/requests" variant="light" size="sm" rightSection={<ArrowLeft size={15} />}>
-            ÙÙ‡Ø±Ø³Øª Ú©Ø§Ù…Ù„
+            فهرست کامل
           </Button>
         }
         noBodyPadding
@@ -428,31 +428,30 @@ export function DashboardPage() {
           </Box>
         ) : (
           <EmptyState
-            title="Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ Ø«Ø¨Øª Ù†Ø´Ø¯Ù‡"
-            description="Ø§ÙˆÙ„ÛŒÙ† Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¨ÛŒÙ…Ø§Ø±Ø³ØªØ§Ù† Ø±Ø§ Ø«Ø¨Øª Ú©Ù†ÛŒØ¯ ØªØ§ Ú†Ø±Ø®Ù‡ ØªØ£Ù…ÛŒÙ† Ø´Ø±ÙˆØ¹ Ø´ÙˆØ¯."
+            title="درخواستی ثبت نشده"
+            description="اولین درخواست بیمارستان را ثبت کنید تا چرخه تأمین شروع شود."
             action={
               <Button component={Link} to="/requests/new" leftSection={<Plus size={16} />}>
-                Ø«Ø¨Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª
+                ثبت درخواست
               </Button>
             }
           />
         )}
       </SectionCard>
 
-      <InlineMessage tone="warning" title="Ø§ÛŒÙ† Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯ ÛŒÚ© Ù†Ù…ÙˆÙ†Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ Ø§Ø³Øª">
-        Ø¯Ø§Ø¯Ù‡â€ŒÙ‡Ø§ Ø³Ø§Ø®ØªÚ¯ÛŒâ€ŒØ§Ù†Ø¯ØŒ Ø¨Ù‡ Backend ÙˆØ§Ù‚Ø¹ÛŒ Ù…ØªØµÙ„ Ù†ÛŒØ³ØªÙ†Ø¯ Ùˆ Ù…Ø¨Ù†Ø§ÛŒ ØªØµÙ…ÛŒÙ… Ù¾Ø²Ø´Ú©ÛŒ Ù‚Ø±Ø§Ø± Ù†Ù…ÛŒâ€ŒÚ¯ÛŒØ±Ù†Ø¯. Ø¨Ø±Ø§ÛŒ Ø¬Ø²Ø¦ÛŒØ§Øª Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯ØŒ
-        Ø­Ø§Ù„Øª Live Ùˆ Ù…Ø­Ø¯ÙˆØ¯ÛŒØªâ€ŒÙ‡Ø§ Ø¨Ù‡ <Link to="/guide" className="font-bold underline">Ø±Ø§Ù‡Ù†Ù…Ø§</Link> Ù…Ø±Ø§Ø¬Ø¹Ù‡ Ú©Ù†ÛŒØ¯.
+      <InlineMessage tone="warning" title="این داشبورد یک نمونه نمایشی است">
+        داده‌ها ساختگی‌اند، به Backend واقعی متصل نیستند و مبنای تصمیم پزشکی قرار نمی‌گیرند. برای جزئیات قرارداد،
+        حالت Live و محدودیت‌ها به <Link to="/guide" className="font-bold underline">راهنما</Link> مراجعه کنید.
       </InlineMessage>
 
       <Group gap="xs" justify="center" c="dimmed">
         <Clock size={14} aria-hidden="true" />
         <Text size="xs">
-          Ù…Ø¨Ù†Ø§ÛŒ Ø²Ù…Ø§Ù†: Gateway Ø´Ø¨ÛŒÙ‡â€ŒØ³Ø§Ø²ÛŒ â€” {formatDateTime(state.sim_time)}
+          مبنای زمان: Gateway شبیه‌سازی — {formatDateTime(state.sim_time)}
         </Text>
         <WarningCircle size={14} aria-hidden="true" />
-        <Text size="xs">ÙÙ‚Ø· Ø±ÙˆÛŒØ¯Ø§Ø¯ donated Ù…ÙˆØ¬ÙˆØ¯ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ù…ÛŒâ€ŒØ³Ø§Ø²Ø¯.</Text>
+        <Text size="xs">فقط رویداد donated موجودی واقعی می‌سازد.</Text>
       </Group>
     </Stack>
   );
 }
-

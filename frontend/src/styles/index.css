@@ -1,4 +1,4 @@
-﻿@layer theme, base, mantine, components, utilities;
+@layer theme, base, mantine, components, utilities;
 
 @import 'tailwindcss';
 @import '@mantine/core/styles.layer.css';
@@ -291,9 +291,9 @@ a {
 }
 
 .bn-donor-step[data-state='failed'] .bn-donor-dot {
-  border-color: #c2413a;
+  border-color: #991b1b;
   background: #fff1f0;
-  color: #c2413a;
+  color: #991b1b;
 }
 
 .bn-timeline-line {
@@ -356,4 +356,3 @@ a {
     scroll-behavior: auto !important;
   }
 }
-

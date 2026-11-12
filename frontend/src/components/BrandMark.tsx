@@ -1,4 +1,4 @@
-﻿import { useId } from 'react';
+import { useId } from 'react';
 
 interface BrandMarkProps {
   size?: number;
@@ -60,4 +60,3 @@ export function BrandMark({ size = 40, className }: BrandMarkProps) {
     </svg>
   );
 }
-
