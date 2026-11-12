@@ -1,4 +1,4 @@
-import {
+﻿import {
   ActionIcon,
   Badge,
   Box,
@@ -27,18 +27,18 @@ export function RequestTable({ requests, now }: RequestTableProps) {
         <Table.ScrollContainer minWidth={860}>
           <Table verticalSpacing="sm" horizontalSpacing="md" highlightOnHover>
             <Table.Caption className="bn-sr-only">
-              فهرست درخواست‌های اهدای خون با وضعیت، فرآورده و مقدار تأمین‌شده
+              ÙÙ‡Ø±Ø³Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øªâ€ŒÙ‡Ø§ÛŒ Ø§Ù‡Ø¯Ø§ÛŒ Ø®ÙˆÙ† Ø¨Ø§ ÙˆØ¶Ø¹ÛŒØªØŒ ÙØ±Ø¢ÙˆØ±Ø¯Ù‡ Ùˆ Ù…Ù‚Ø¯Ø§Ø± ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡
             </Table.Caption>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>درخواست</Table.Th>
-                <Table.Th>فرآورده</Table.Th>
-                <Table.Th>گروه</Table.Th>
-                <Table.Th>تأمین / درخواست</Table.Th>
-                <Table.Th>وضعیت</Table.Th>
-                <Table.Th>فوریت</Table.Th>
-                <Table.Th>آخرین به‌روزرسانی</Table.Th>
-                <Table.Th aria-label="عملیات" />
+                <Table.Th>Ø¯Ø±Ø®ÙˆØ§Ø³Øª</Table.Th>
+                <Table.Th>ÙØ±Ø¢ÙˆØ±Ø¯Ù‡</Table.Th>
+                <Table.Th>Ú¯Ø±ÙˆÙ‡</Table.Th>
+                <Table.Th>ØªØ£Ù…ÛŒÙ† / Ø¯Ø±Ø®ÙˆØ§Ø³Øª</Table.Th>
+                <Table.Th>ÙˆØ¶Ø¹ÛŒØª</Table.Th>
+                <Table.Th>ÙÙˆØ±ÛŒØª</Table.Th>
+                <Table.Th>Ø¢Ø®Ø±ÛŒÙ† Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ</Table.Th>
+                <Table.Th aria-label="Ø¹Ù…Ù„ÛŒØ§Øª" />
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -58,7 +58,7 @@ export function RequestTable({ requests, now }: RequestTableProps) {
                         {request.id}
                       </Text>
                       <Group gap={4} wrap="nowrap">
-                        <MapPin size={12} color="#6B8587" aria-hidden="true" />
+                        <MapPin size={12} color="#6b4a4f" aria-hidden="true" />
                         <Text size="xs" c="dimmed" truncate maw={190}>
                           {request.hospital_name}
                         </Text>
@@ -77,7 +77,7 @@ export function RequestTable({ requests, now }: RequestTableProps) {
                         {formatNumber(request.supplied_units)}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        از {formatNumber(request.units)}
+                        Ø§Ø² {formatNumber(request.units)}
                       </Text>
                       <Progress
                         value={clampPercent(request.supplied_units, request.units)}
@@ -85,7 +85,7 @@ export function RequestTable({ requests, now }: RequestTableProps) {
                         radius="xl"
                         color={request.supplied_units >= request.units ? 'green' : 'brand'}
                         className="w-14"
-                        aria-label={`پیشرفت تأمین ${request.supplied_units} از ${request.units}`}
+                        aria-label={`Ù¾ÛŒØ´Ø±ÙØª ØªØ£Ù…ÛŒÙ† ${request.supplied_units} Ø§Ø² ${request.units}`}
                       />
                     </Group>
                   </Table.Td>
@@ -108,7 +108,7 @@ export function RequestTable({ requests, now }: RequestTableProps) {
                       color="brand"
                       size="md"
                       radius="md"
-                      aria-label={`مشاهده درخواست ${request.id}`}
+                      aria-label={`Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øª ${request.id}`}
                     >
                       <CaretLeft size={17} weight="bold" />
                     </ActionIcon>
@@ -122,7 +122,7 @@ export function RequestTable({ requests, now }: RequestTableProps) {
 
       <Stack gap="sm" hiddenFrom="md">
         {requests.map((request) => (
-          <Link key={request.id} to={`/requests/${request.id}`} aria-label={`مشاهده درخواست ${request.id}`}>
+          <Link key={request.id} to={`/requests/${request.id}`} aria-label={`Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øª ${request.id}`}>
             <Paper className="bn-card" p="md" radius="lg">
               <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
                 <Box className="min-w-0">
@@ -145,7 +145,7 @@ export function RequestTable({ requests, now }: RequestTableProps) {
                 <Group gap={6}>
                   <Drop size={14} color="#C2413A" weight="fill" aria-hidden="true" />
                   <Text size="xs" c="dimmed">
-                    تأمین‌شده
+                    ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡
                   </Text>
                   <Text size="sm" fw={700} className="bn-number">
                     {formatNumber(request.supplied_units)} / {formatNumber(request.units)}
@@ -169,3 +169,4 @@ export function RequestTable({ requests, now }: RequestTableProps) {
     </>
   );
 }
+

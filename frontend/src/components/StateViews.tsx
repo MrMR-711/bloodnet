@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+﻿import type { ReactNode } from 'react';
 import { Box, Button, Group, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { ArrowRight, MagnifyingGlass, WarningCircle } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
@@ -39,7 +39,7 @@ interface ErrorStateProps {
   action?: ReactNode;
 }
 
-export function ErrorState({ code = 'خطا', title, description, action }: ErrorStateProps) {
+export function ErrorState({ code = 'Ø®Ø·Ø§', title, description, action }: ErrorStateProps) {
   return (
     <Paper className="bn-card" p="xl">
       <Stack align="center" gap="sm" ta="center" maw={520} mx="auto">
@@ -64,7 +64,7 @@ export function ErrorState({ code = 'خطا', title, description, action }: Erro
             mt="xs"
             leftSection={<ArrowRight size={16} />}
           >
-            بازگشت به داشبورد
+            Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯
           </Button>
         )}
       </Stack>
@@ -79,7 +79,7 @@ interface InlineMessageProps {
 }
 
 const TONE_STYLES = {
-  info: { background: '#EDF9F8', border: '#C7E8E2', color: '#0B5F59' },
+  info: { background: '#fff1f1', border: '#f3c7ca', color: '#0B5F59' },
   warning: { background: '#FFF8E6', border: '#F3D9A4', color: '#7A3E06' },
   danger: { background: '#FFF1F0', border: '#F5C4C0', color: '#8B2B26' },
   success: { background: '#ECFDF3', border: '#BBE8CD', color: '#05603A' },
@@ -112,3 +112,4 @@ export function InlineMessage({ title, children, tone = 'info' }: InlineMessageP
     </Box>
   );
 }
+
