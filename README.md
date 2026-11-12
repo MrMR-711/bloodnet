@@ -15,6 +15,13 @@ Frontend، API اجرایی، Database، Migration یا UI واقعی ساخته
 - منابع رسمی فقط از `../main_cloned/` خوانده می‌شوند؛ آن پوشه فقط‌خواندنی است.
 - توسعه مستقیم روزمره روی `main` ممنوع است.
 
+## Remote
+
+- URL: `https://github.com/MrMR-711/bloodnet`
+- Visibility: `Private`
+- Default Branch: `main`
+- Branchهای موجود: `main`، `backend`، `frontend`
+
 ## ساختار پیشنهادی
 
 ```text

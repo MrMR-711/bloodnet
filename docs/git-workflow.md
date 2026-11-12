@@ -1,18 +1,18 @@
 # گردش کار Git تیم — BloodNet
 
-**وضعیت:** `DESIGN CONFIRMED — REMOTE/AUTH PENDING`
+**وضعیت:** `CONFIRMED — REMOTE CONFIGURED — AUTH VERIFIED`
 
 ## ۱. Branchها
 
 | Branch | نقش | مالک | `user.name` | `user.email` |
 |---|---|---|---|---|
-| `main` | ادغام و نسخه پایدار | مالک واقعی Merge | پس از تأیید | پس از تأیید |
+| `main` | ادغام و نسخه پایدار | `MrMR-711` | `MrMR-711` | `mohammad117811@gmail.com` |
 | `backend` | توسعه Backend | `MrMR-711` | `MrMR-711` | `mohammad117811@gmail.com` |
 | `frontend` | توسعه Frontend | `Reza-zahedi` | `Reza-zahedi` | `zahdireza6327@gmail.com` |
 
 - هر دو Branch کاری در همین Repository مشترک هستند؛ دو مخزن جدا ساخته نمی‌شود.
 - توسعه مستقیم روزمره روی `main` ممنوع است.
-- تا آماده‌شدن Remote و احراز هویت، Branch کاری و Commit اولیه ساخته نمی‌شود.
+- هر سه Branch در وضعیت فعلی به Commit اولیه مشترک اشاره می‌کنند.
 
 ## ۲. هویت Commit در برابر احراز هویت Push
 
@@ -36,34 +36,34 @@ git -c user.name="Reza-zahedi" \
 3. برای جداسازی کامل، می‌توان از Worktreeهای مستقل با `includeIf` بر اساس
    مسیر استفاده کرد. این گزینه فعلاً انتخاب نشده است.
 
-هیچ Commitی نباید با Identity حدسی یا نادرست ثبت شود. Email باید در حساب
-متناظر GitHub تأیید شده باشد.
+در این محیط، Identity پیش‌فرض مخزن `MrMR-711` است و Commitهای `frontend`
+باید با Override بالا ثبت شوند. Email باید در حساب متناظر GitHub تأیید شده باشد.
 
-## ۳. Remoteهای طراحی‌شده
+## ۳. Remoteهای تنظیم‌شده
 
-| Branch | Remote نام منطقی | حساب Push |
-|---|---|---|
-| `backend` | `origin-backend` | `MrMR-711` |
-| `frontend` | `origin-frontend` | `Reza-zahedi` |
-| `main` | `origin` | مالک واقعی Merge |
+| Branch | Remote | URL | حساب Push تأییدشده |
+|---|---|---|---|
+| `main` | `origin` | `https://github.com/MrMR-711/bloodnet.git` | `MrMR-711` |
+| `backend` | `origin-backend` | `https://github.com/MrMR-711/bloodnet.git` | `MrMR-711` |
+| `frontend` | `origin-frontend` | `https://github.com/MrMR-711/bloodnet.git` | `reza-zahedi6327` |
 
-`origin-backend` و `origin-frontend` می‌توانند URL یکسان داشته باشند؛ اما
-احراز هویت هر Push باید مستقل تأیید شود. Remote مسابقه هرگز Remote محصول
-نمی‌شود.
+`origin-backend` و `origin-frontend` URL یکسان دارند؛ تفکیک آن‌ها منطقی است و
+احراز هویت هر Push با تغییر حساب فعال `gh` کنترل می‌شود. Remote مسابقه هرگز
+Remote محصول نمی‌شود.
 
 ## ۴. روش احراز هویت
 
-### گزینه HTTPS با GitHub CLI
+### HTTPS با GitHub CLI
 
 ```bash
-gh auth login
 gh auth status
-gh auth switch
+gh auth switch --user MrMR-711
+gh auth switch --user reza-zahedi6327
 ```
 
-- `gh auth switch` حساب فعال را تغییر می‌دهد.
+- `credential.https://github.com.helper` به `gh auth git-credential` تنظیم شده است.
 - پیش از Push هر Branch، حساب فعال باید با مالک همان Branch مطابق باشد.
-- Credential Helper نباید Token خام را در فایل پروژه ذخیره کند.
+- Token خام در فایل پروژه ذخیره نمی‌شود.
 
 ### گزینه SSH
 
@@ -84,7 +84,7 @@ Host github-frontend
 ```
 
 Private Key هرگز داخل مخزن یا Workspace ذخیره نمی‌شود. در وضعیت فعلی
-`~/.ssh/config` و کلید خصوصی وجود ندارد؛ این گزینه `NOT READY` است.
+`~/.ssh/config` و کلید خصوصی وجود ندارد؛ این گزینه `NOT USED` است.
 
 ## ۵. چرخه اجباری هر تغییر
 
@@ -110,10 +110,10 @@ Private Key هرگز داخل مخزن یا Workspace ذخیره نمی‌شود
 | مورد | وضعیت |
 |---|---|
 | Local Repository | `INITIALIZED` |
-| Initial Commit | `NOT CREATED` |
-| Remote | `NOT CONFIGURED` |
-| Branchهای کاری | `NOT CREATED` |
-| Auth Owner (`MrMR-711`) | `NOT AUTHENTICATED` |
-| Auth Teammate | `AUTHENTICATED AS reza-zahedi6327` (نیازمند تأیید تطابق) |
-| Collaboration Invite | `NOT SENT` |
-| Push | `NOT ATTEMPTED` |
+| Initial Commit | `d7d307d` — `CREATED AND PUSHED` |
+| Remoteها | `origin` / `origin-backend` / `origin-frontend` — `CONFIGURED` |
+| Branchهای کاری | `backend` و `frontend` — `CREATED AND PUSHED` |
+| Auth Owner (`MrMR-711`) | `VERIFIED` |
+| Auth Teammate (`reza-zahedi6327`) | `VERIFIED` |
+| Collaboration Invite | `ACCEPTED — WRITE` |
+| Push `main` / `backend` / `frontend` | `VERIFIED` |
