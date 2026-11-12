@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActionIcon,
   AppShell,
@@ -107,9 +107,25 @@ function pageMeta(pathname: string): { title: string; subtitle: string } {
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const [resetOpen, resetModal] = useDisclosure();
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const { state, resetDemo } = useDemoStore();
   const { pathname } = useLocation();
   const meta = pageMeta(pathname);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/health')
+      .then((response) => response.json())
+      .then((body) => {
+        if (alive) setApiStatus(body?.ok ? 'online' : 'offline');
+      })
+      .catch(() => {
+        if (alive) setApiStatus('offline');
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     close();
@@ -166,6 +182,18 @@ export function AppLayout() {
           </Group>
 
           <Group gap="xs" wrap="nowrap">
+            <Tooltip label={apiStatus === 'online' ? 'Backend متصل است' : apiStatus === 'offline' ? 'Backend در دسترس نیست' : 'در حال بررسی Backend'}>
+              <Badge
+                variant="light"
+                color={apiStatus === 'online' ? 'green' : apiStatus === 'offline' ? 'red' : 'gray'}
+                size="lg"
+                radius="md"
+                visibleFrom="sm"
+                leftSection={<Heartbeat size={13} weight="bold" aria-hidden="true" />}
+              >
+                {apiStatus === 'online' ? 'API متصل' : apiStatus === 'offline' ? 'API قطع' : 'API ...'}
+              </Badge>
+            </Tooltip>
             <Tooltip label="ساعت شبیه‌سازی از Gateway">
               <Box visibleFrom="sm">
                 <Badge
