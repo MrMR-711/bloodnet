@@ -1,16 +1,16 @@
 import { createTheme, rem, type MantineColorsTuple } from '@mantine/core';
 
 const brand: MantineColorsTuple = [
-  '#E6F7F5',
-  '#C3ECE7',
-  '#9BDED6',
-  '#6ECFC4',
-  '#45C1B3',
-  '#22B3A3',
-  '#0F766E',
-  '#0B5F59',
-  '#084A46',
-  '#043531',
+  '#FFF1F1',
+  '#FFE0E0',
+  '#FFC7C7',
+  '#FFA3A3',
+  '#F87171',
+  '#EF4444',
+  '#DC2626',
+  '#B91C1C',
+  '#991B1B',
+  '#7F1D1D',
 ];
 
 const crimson: MantineColorsTuple = [
@@ -41,7 +41,7 @@ const amber: MantineColorsTuple = [
 
 export const theme = createTheme({
   primaryColor: 'brand',
-  primaryShade: 6,
+  primaryShade: 7,
   fontFamily: 'Vazirmatn Variable, Vazirmatn, Tahoma, sans-serif',
   headings: {
     fontFamily: 'Vazirmatn Variable, Vazirmatn, Tahoma, sans-serif',

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+﻿import { useState, type ReactNode } from 'react';
 import {
   Badge,
   Box,
@@ -60,12 +60,12 @@ import {
 import type { DonorProgress, DonorRecord } from '../types/domain';
 
 const DONOR_STEPS: { key: string; label: string; icon: ReactNode }[] = [
-  { key: 'invited', label: 'دعوت', icon: <Envelope size={14} /> },
-  { key: 'accepted', label: 'پذیرش', icon: <Check size={14} /> },
-  { key: 'en_route', label: 'در مسیر', icon: <Truck size={14} /> },
-  { key: 'arrived', label: 'رسیدن', icon: <MapPin size={14} /> },
-  { key: 'screen_pass', label: 'غربالگری', icon: <ShieldCheck size={14} /> },
-  { key: 'donated', label: 'اهدای واقعی', icon: <Drop size={14} weight="fill" /> },
+  { key: 'invited', label: 'Ø¯Ø¹ÙˆØª', icon: <Envelope size={14} /> },
+  { key: 'accepted', label: 'Ù¾Ø°ÛŒØ±Ø´', icon: <Check size={14} /> },
+  { key: 'en_route', label: 'Ø¯Ø± Ù…Ø³ÛŒØ±', icon: <Truck size={14} /> },
+  { key: 'arrived', label: 'Ø±Ø³ÛŒØ¯Ù†', icon: <MapPin size={14} /> },
+  { key: 'screen_pass', label: 'ØºØ±Ø¨Ø§Ù„Ú¯Ø±ÛŒ', icon: <ShieldCheck size={14} /> },
+  { key: 'donated', label: 'Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ', icon: <Drop size={14} weight="fill" /> },
 ];
 
 const FAILED_STEP: Partial<Record<DonorRecord['status'], number>> = {
@@ -90,8 +90,8 @@ export function DonorPage() {
 
   const notifyError = (error: unknown) => {
     notifications.show({
-      title: 'عملیات انجام نشد',
-      message: error instanceof DemoError ? error.message : 'خطای نامشخص در حالت نمایشی رخ داد.',
+      title: 'Ø¹Ù…Ù„ÛŒØ§Øª Ø§Ù†Ø¬Ø§Ù… Ù†Ø´Ø¯',
+      message: error instanceof DemoError ? error.message : 'Ø®Ø·Ø§ÛŒ Ù†Ø§Ù…Ø´Ø®Øµ Ø¯Ø± Ø­Ø§Ù„Øª Ù†Ù…Ø§ÛŒØ´ÛŒ Ø±Ø® Ø¯Ø§Ø¯.',
       color: 'red',
     });
   };
@@ -101,11 +101,11 @@ export function DonorPage() {
     try {
       respondDonor(selectedDonor.id, response);
       notifications.show({
-        title: response === 'accepted' ? 'دعوت پذیرفته شد' : 'دعوت رد شد',
+        title: response === 'accepted' ? 'Ø¯Ø¹ÙˆØª Ù¾Ø°ÛŒØ±ÙØªÙ‡ Ø´Ø¯' : 'Ø¯Ø¹ÙˆØª Ø±Ø¯ Ø´Ø¯',
         message:
           response === 'accepted'
-            ? 'پذیرش دعوت فقط شمارنده confirmed را تغییر می‌دهد و اهدا محسوب نمی‌شود.'
-            : 'رد دعوت هیچ تأثیری بر مقدار تأمین‌شده ندارد.',
+            ? 'Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª ÙÙ‚Ø· Ø´Ù…Ø§Ø±Ù†Ø¯Ù‡ confirmed Ø±Ø§ ØªØºÛŒÛŒØ± Ù…ÛŒâ€ŒØ¯Ù‡Ø¯ Ùˆ Ø§Ù‡Ø¯Ø§ Ù…Ø­Ø³ÙˆØ¨ Ù†Ù…ÛŒâ€ŒØ´ÙˆØ¯.'
+            : 'Ø±Ø¯ Ø¯Ø¹ÙˆØª Ù‡ÛŒÚ† ØªØ£Ø«ÛŒØ±ÛŒ Ø¨Ø± Ù…Ù‚Ø¯Ø§Ø± ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ù†Ø¯Ø§Ø±Ø¯.',
         color: response === 'accepted' ? 'green' : 'gray',
         icon: response === 'accepted' ? <CheckCircle size={18} /> : <X size={18} />,
       });
@@ -119,11 +119,11 @@ export function DonorPage() {
     try {
       progressDonor(selectedDonor.id, progress);
       notifications.show({
-        title: progress === 'donated' ? 'اهدای واقعی ثبت شد' : 'رویداد اهداکننده ثبت شد',
+        title: progress === 'donated' ? 'Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ø«Ø¨Øª Ø´Ø¯' : 'Ø±ÙˆÛŒØ¯Ø§Ø¯ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ø«Ø¨Øª Ø´Ø¯',
         message:
           progress === 'donated'
-            ? 'فقط این رویداد مقدار «واقعاً تأمین‌شده» را یک واحد افزایش داد.'
-            : 'این رویداد مقدار تأمین‌شده را تغییر نمی‌دهد.',
+            ? 'ÙÙ‚Ø· Ø§ÛŒÙ† Ø±ÙˆÛŒØ¯Ø§Ø¯ Ù…Ù‚Ø¯Ø§Ø± Â«ÙˆØ§Ù‚Ø¹Ø§Ù‹ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡Â» Ø±Ø§ ÛŒÚ© ÙˆØ§Ø­Ø¯ Ø§ÙØ²Ø§ÛŒØ´ Ø¯Ø§Ø¯.'
+            : 'Ø§ÛŒÙ† Ø±ÙˆÛŒØ¯Ø§Ø¯ Ù…Ù‚Ø¯Ø§Ø± ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ø±Ø§ ØªØºÛŒÛŒØ± Ù†Ù…ÛŒâ€ŒØ¯Ù‡Ø¯.',
         color: progress === 'donated' ? 'green' : 'cyan',
         icon: progress === 'donated' ? <FirstAidKit size={18} /> : <Info size={18} />,
       });
@@ -135,24 +135,24 @@ export function DonorPage() {
   return (
     <Stack gap="lg">
       <PageHeader
-        eyebrow="مسیر اهداکننده"
-        title="پورتال اهداکننده"
-        description="دعوت، پذیرش، حرکت، رسیدن، غربالگری و اهدای واقعی رویدادهای مستقل‌اند. فقط ثبت donated موجودی واقعی می‌سازد."
+        eyebrow="Ù…Ø³ÛŒØ± Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡"
+        title="Ù¾ÙˆØ±ØªØ§Ù„ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡"
+        description="Ø¯Ø¹ÙˆØªØŒ Ù¾Ø°ÛŒØ±Ø´ØŒ Ø­Ø±Ú©ØªØŒ Ø±Ø³ÛŒØ¯Ù†ØŒ ØºØ±Ø¨Ø§Ù„Ú¯Ø±ÛŒ Ùˆ Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ø±ÙˆÛŒØ¯Ø§Ø¯Ù‡Ø§ÛŒ Ù…Ø³ØªÙ‚Ù„â€ŒØ§Ù†Ø¯. ÙÙ‚Ø· Ø«Ø¨Øª donated Ù…ÙˆØ¬ÙˆØ¯ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ù…ÛŒâ€ŒØ³Ø§Ø²Ø¯."
         actions={
           <Button component={Link} to="/inventory" variant="default" leftSection={<Drop size={17} weight="fill" />}>
-            موجودی مراکز
+            Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ù…Ø±Ø§Ú©Ø²
           </Button>
         }
       />
 
       {!selectedDonor ? (
         <EmptyState
-          title="اهداکننده‌ای در نمونه وجود ندارد"
-          description="داده نمایشی را از منوی کاربر بازنشانی کنید یا درخواست جدیدی ثبت کنید."
+          title="Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡â€ŒØ§ÛŒ Ø¯Ø± Ù†Ù…ÙˆÙ†Ù‡ ÙˆØ¬ÙˆØ¯ Ù†Ø¯Ø§Ø±Ø¯"
+          description="Ø¯Ø§Ø¯Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ Ø±Ø§ Ø§Ø² Ù…Ù†ÙˆÛŒ Ú©Ø§Ø±Ø¨Ø± Ø¨Ø§Ø²Ù†Ø´Ø§Ù†ÛŒ Ú©Ù†ÛŒØ¯ ÛŒØ§ Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¬Ø¯ÛŒØ¯ÛŒ Ø«Ø¨Øª Ú©Ù†ÛŒØ¯."
           icon={<UsersThree size={26} />}
           action={
             <Button component={Link} to="/requests/new" leftSection={<ArrowRight size={16} />}>
-              ثبت درخواست جدید
+              Ø«Ø¨Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø¬Ø¯ÛŒØ¯
             </Button>
           }
         />
@@ -160,14 +160,14 @@ export function DonorPage() {
         <Grid gap="lg">
           <Grid.Col span={{ base: 12, lg: 4 }}>
             <Stack gap="lg">
-              <SectionCard title="انتخاب اهداکننده" description={`${formatNumber(state.donors.length)} اهداکننده نمایشی`}>
+              <SectionCard title="Ø§Ù†ØªØ®Ø§Ø¨ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡" description={`${formatNumber(state.donors.length)} Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ù†Ù…Ø§ÛŒØ´ÛŒ`}>
                 <Select
-                  label="اهداکننده"
+                  label="Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡"
                   value={selectedDonor.id}
                   onChange={(value) => value && setSelectedDonorId(value)}
                   data={state.donors.map((donor) => ({
                     value: donor.id,
-                    label: `${donor.name} — ${donor.blood_group} — ${DONOR_STATUS_LABELS[donor.status]}`,
+                    label: `${donor.name} â€” ${donor.blood_group} â€” ${DONOR_STATUS_LABELS[donor.status]}`,
                   }))}
                   allowDeselect={false}
                   searchable
@@ -183,8 +183,8 @@ export function DonorPage() {
                         aria-pressed={isActive}
                         className="w-full rounded-xl border p-3 text-start transition-colors"
                         style={{
-                          borderColor: isActive ? '#7DD3C7' : 'var(--bn-border)',
-                          background: isActive ? '#EDF9F8' : 'white',
+                          borderColor: isActive ? '#fca5a5' : 'var(--bn-border)',
+                          background: isActive ? '#fff1f1' : 'white',
                         }}
                       >
                         <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
@@ -207,9 +207,9 @@ export function DonorPage() {
                 </Stack>
               </SectionCard>
 
-              <InlineMessage tone="info" title="پذیرش دعوت ≠ اهدا">
-                دعوت شدن، پذیرفتن، حرکت به مرکز، رسیدن یا قبولی غربالگری هیچ‌کدام باعث افزایش «مقدار واقعاً
-                تأمین‌شده» نمی‌شوند. فقط رویداد <span className="bn-mono bn-ltr">donated</span> این کار را می‌کند.
+              <InlineMessage tone="info" title="Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª â‰  Ø§Ù‡Ø¯Ø§">
+                Ø¯Ø¹ÙˆØª Ø´Ø¯Ù†ØŒ Ù¾Ø°ÛŒØ±ÙØªÙ†ØŒ Ø­Ø±Ú©Øª Ø¨Ù‡ Ù…Ø±Ú©Ø²ØŒ Ø±Ø³ÛŒØ¯Ù† ÛŒØ§ Ù‚Ø¨ÙˆÙ„ÛŒ ØºØ±Ø¨Ø§Ù„Ú¯Ø±ÛŒ Ù‡ÛŒÚ†â€ŒÚ©Ø¯Ø§Ù… Ø¨Ø§Ø¹Ø« Ø§ÙØ²Ø§ÛŒØ´ Â«Ù…Ù‚Ø¯Ø§Ø± ÙˆØ§Ù‚Ø¹Ø§Ù‹
+                ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡Â» Ù†Ù…ÛŒâ€ŒØ´ÙˆÙ†Ø¯. ÙÙ‚Ø· Ø±ÙˆÛŒØ¯Ø§Ø¯ <span className="bn-mono bn-ltr">donated</span> Ø§ÛŒÙ† Ú©Ø§Ø± Ø±Ø§ Ù…ÛŒâ€ŒÚ©Ù†Ø¯.
               </InlineMessage>
             </Stack>
           </Grid.Col>
@@ -217,8 +217,8 @@ export function DonorPage() {
           <Grid.Col span={{ base: 12, lg: 8 }}>
             <Stack gap="lg">
               <SectionCard
-                title="کارت دعوت اهدا"
-                description="اطلاعات هویتی نمایشی و وضعیت پیام Gateway"
+                title="Ú©Ø§Ø±Øª Ø¯Ø¹ÙˆØª Ø§Ù‡Ø¯Ø§"
+                description="Ø§Ø·Ù„Ø§Ø¹Ø§Øª Ù‡ÙˆÛŒØªÛŒ Ù†Ù…Ø§ÛŒØ´ÛŒ Ùˆ ÙˆØ¶Ø¹ÛŒØª Ù¾ÛŒØ§Ù… Gateway"
                 action={<DonorStatusBadge status={selectedDonor.status} size="md" />}
               >
                 <Stack gap="md">
@@ -246,7 +246,7 @@ export function DonorPage() {
                     <Stack gap={6} align="flex-end">
                       <GatewayStatusBadge status={selectedDonor.gateway_status} size="sm" />
                       <Text size="xs" c="dimmed">
-                        دعوت: {formatRelative(selectedDonor.invited_at, state.sim_time)}
+                        Ø¯Ø¹ÙˆØª: {formatRelative(selectedDonor.invited_at, state.sim_time)}
                       </Text>
                     </Stack>
                   </Group>
@@ -254,19 +254,19 @@ export function DonorPage() {
                   <Divider />
 
                   <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-                    <InfoLine label="شناسه اهداکننده" value={selectedDonor.id} mono />
-                    <InfoLine label="فرآورده" value={PRODUCT_LABELS[selectedDonor.product]} />
-                    <InfoLine label="درخواست مرتبط" value={selectedDonor.request_id} mono />
-                    <InfoLine label="آخرین به‌روزرسانی" value={formatDateTime(selectedDonor.updated_at)} />
+                    <InfoLine label="Ø´Ù†Ø§Ø³Ù‡ Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡" value={selectedDonor.id} mono />
+                    <InfoLine label="ÙØ±Ø¢ÙˆØ±Ø¯Ù‡" value={PRODUCT_LABELS[selectedDonor.product]} />
+                    <InfoLine label="Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…Ø±ØªØ¨Ø·" value={selectedDonor.request_id} mono />
+                    <InfoLine label="Ø¢Ø®Ø±ÛŒÙ† Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ" value={formatDateTime(selectedDonor.updated_at)} />
                   </SimpleGrid>
 
                   {request && (
-                    <Box className="rounded-xl border border-[var(--bn-border)] bg-[#F9FCFB] p-3">
+                    <Box className="rounded-xl border border-[var(--bn-border)] bg-[#fff8f8] p-3">
                       <Group justify="space-between" align="flex-start" gap="sm" wrap="wrap">
                         <Box>
                           <Group gap={6} wrap="nowrap">
                             <Text size="xs" c="dimmed">
-                              درخواست مرتبط
+                              Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…Ø±ØªØ¨Ø·
                             </Text>
                             <StateBadge state={request.state} size="xs" />
                           </Group>
@@ -276,7 +276,7 @@ export function DonorPage() {
                           <Group gap={6} mt={4}>
                             <ProductBadge product={request.product} size="xs" />
                             <Text size="xs" c="dimmed">
-                              {formatNumber(request.supplied_units)} از {formatNumber(request.units)} واحد تأمین‌شده
+                              {formatNumber(request.supplied_units)} Ø§Ø² {formatNumber(request.units)} ÙˆØ§Ø­Ø¯ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡
                             </Text>
                           </Group>
                         </Box>
@@ -287,7 +287,7 @@ export function DonorPage() {
                           size="xs"
                           rightSection={<ArrowRight size={13} />}
                         >
-                          جزئیات درخواست
+                          Ø¬Ø²Ø¦ÛŒØ§Øª Ø¯Ø±Ø®ÙˆØ§Ø³Øª
                         </Button>
                       </Group>
                     </Box>
@@ -295,7 +295,7 @@ export function DonorPage() {
                 </Stack>
               </SectionCard>
 
-              <SectionCard title="مسیر اهدا" description="هر مرحله یک رویداد مستقل است؛ رنگ سبز فقط وضعیت مسیر را نشان می‌دهد">
+              <SectionCard title="Ù…Ø³ÛŒØ± Ø§Ù‡Ø¯Ø§" description="Ù‡Ø± Ù…Ø±Ø­Ù„Ù‡ ÛŒÚ© Ø±ÙˆÛŒØ¯Ø§Ø¯ Ù…Ø³ØªÙ‚Ù„ Ø§Ø³ØªØ› Ø±Ù†Ú¯ Ø³Ø¨Ø² ÙÙ‚Ø· ÙˆØ¶Ø¹ÛŒØª Ù…Ø³ÛŒØ± Ø±Ø§ Ù†Ø´Ø§Ù† Ù…ÛŒâ€ŒØ¯Ù‡Ø¯">
                 <Box className="rounded-xl border border-[var(--bn-border)] bg-white p-4">
                   <Group gap={0} align="flex-start" wrap="nowrap" className="bn-scroll-x">
                     {DONOR_STEPS.map((step, index) => {
@@ -314,34 +314,34 @@ export function DonorPage() {
 
                 <Group justify="space-between" mt="md" gap="sm" wrap="wrap">
                   <Group gap={6}>
-                    <Clock size={15} color="#526D71" aria-hidden="true" />
+                    <Clock size={15} color="#6b4a4f" aria-hidden="true" />
                     <Text size="xs" c="dimmed">
-                      آخرین رویداد: {formatRelative(selectedDonor.updated_at, state.sim_time)}
+                      Ø¢Ø®Ø±ÛŒÙ† Ø±ÙˆÛŒØ¯Ø§Ø¯: {formatRelative(selectedDonor.updated_at, state.sim_time)}
                     </Text>
                   </Group>
                   {selectedDonor.status === 'donated' ? (
                     <Badge color="green" variant="light" leftSection={<CheckCircle size={13} />}>
-                      اهدای واقعی ثبت شد
+                      Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ø«Ø¨Øª Ø´Ø¯
                     </Badge>
                   ) : (
                     <Badge color="orange" variant="light">
-                      هنوز اهدای واقعی ثبت نشده
+                      Ù‡Ù†ÙˆØ² Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ Ø«Ø¨Øª Ù†Ø´Ø¯Ù‡
                     </Badge>
                   )}
                 </Group>
               </SectionCard>
 
               <SectionCard
-                title="اقدام بعدی"
-                description="فقط گذارهای مجاز در قرارداد نمایش داده می‌شوند"
+                title="Ø§Ù‚Ø¯Ø§Ù… Ø¨Ø¹Ø¯ÛŒ"
+                description="ÙÙ‚Ø· Ú¯Ø°Ø§Ø±Ù‡Ø§ÛŒ Ù…Ø¬Ø§Ø² Ø¯Ø± Ù‚Ø±Ø§Ø±Ø¯Ø§Ø¯ Ù†Ù…Ø§ÛŒØ´ Ø¯Ø§Ø¯Ù‡ Ù…ÛŒâ€ŒØ´ÙˆÙ†Ø¯"
                 action={<DonorStatusBadge status={selectedDonor.status} size="md" />}
               >
                 <Stack gap="sm">
                   {selectedDonor.status === 'invited' && (
                     <>
                       <Text size="sm" c="dimmed" lh={1.8}>
-                        این اهداکننده دعوت شده و منتظر پاسخ است. پذیرش دعوت شمارنده confirmed را افزایش می‌دهد،
-                        اما هیچ واحدی به موجودی یا تأمین‌شده اضافه نمی‌کند.
+                        Ø§ÛŒÙ† Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ø¯Ø¹ÙˆØª Ø´Ø¯Ù‡ Ùˆ Ù…Ù†ØªØ¸Ø± Ù¾Ø§Ø³Ø® Ø§Ø³Øª. Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª Ø´Ù…Ø§Ø±Ù†Ø¯Ù‡ confirmed Ø±Ø§ Ø§ÙØ²Ø§ÛŒØ´ Ù…ÛŒâ€ŒØ¯Ù‡Ø¯ØŒ
+                        Ø§Ù…Ø§ Ù‡ÛŒÚ† ÙˆØ§Ø­Ø¯ÛŒ Ø¨Ù‡ Ù…ÙˆØ¬ÙˆØ¯ÛŒ ÛŒØ§ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ø§Ø¶Ø§ÙÙ‡ Ù†Ù…ÛŒâ€ŒÚ©Ù†Ø¯.
                       </Text>
                       <Group gap="sm">
                         <Button
@@ -349,7 +349,7 @@ export function DonorPage() {
                           leftSection={<Check size={17} />}
                           onClick={() => handleResponse('accepted')}
                         >
-                          پذیرش دعوت
+                          Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª
                         </Button>
                         <Button
                           variant="default"
@@ -357,7 +357,7 @@ export function DonorPage() {
                           leftSection={<X size={17} />}
                           onClick={() => handleResponse('declined')}
                         >
-                          رد دعوت
+                          Ø±Ø¯ Ø¯Ø¹ÙˆØª
                         </Button>
                       </Group>
                     </>
@@ -365,8 +365,8 @@ export function DonorPage() {
 
                   {selectedDonor.status === 'accepted' && (
                     <ProgressButton
-                      label="حرکت به مرکز"
-                      description="en_route — اهداکننده در مسیر است؛ تأمین‌شده تغییر نمی‌کند."
+                      label="Ø­Ø±Ú©Øª Ø¨Ù‡ Ù…Ø±Ú©Ø²"
+                      description="en_route â€” Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ø¯Ø± Ù…Ø³ÛŒØ± Ø§Ø³ØªØ› ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ ØªØºÛŒÛŒØ± Ù†Ù…ÛŒâ€ŒÚ©Ù†Ø¯."
                       icon={<Truck size={18} />}
                       color="cyan"
                       onClick={() => handleProgress('en_route')}
@@ -375,8 +375,8 @@ export function DonorPage() {
 
                   {selectedDonor.status === 'en_route' && (
                     <ProgressButton
-                      label="رسیدن به مرکز"
-                      description="arrived — رسیدن به مرکز هنوز اهدا نیست."
+                      label="Ø±Ø³ÛŒØ¯Ù† Ø¨Ù‡ Ù…Ø±Ú©Ø²"
+                      description="arrived â€” Ø±Ø³ÛŒØ¯Ù† Ø¨Ù‡ Ù…Ø±Ú©Ø² Ù‡Ù†ÙˆØ² Ø§Ù‡Ø¯Ø§ Ù†ÛŒØ³Øª."
                       icon={<MapPin size={18} />}
                       color="indigo"
                       onClick={() => handleProgress('arrived')}
@@ -386,15 +386,15 @@ export function DonorPage() {
                   {selectedDonor.status === 'arrived' && (
                     <Group gap="sm" grow>
                       <ProgressButton
-                        label="قبولی غربالگری"
-                        description="screen_pass — صلاحیت اولیه؛ تأمین‌شده بدون تغییر."
+                        label="Ù‚Ø¨ÙˆÙ„ÛŒ ØºØ±Ø¨Ø§Ù„Ú¯Ø±ÛŒ"
+                        description="screen_pass â€” ØµÙ„Ø§Ø­ÛŒØª Ø§ÙˆÙ„ÛŒÙ‡Ø› ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ø¨Ø¯ÙˆÙ† ØªØºÛŒÛŒØ±."
                         icon={<ShieldCheck size={18} />}
                         color="teal"
                         onClick={() => handleProgress('screen_pass')}
                       />
                       <ProgressButton
-                        label="رد غربالگری"
-                        description="screen_fail — اهدا انجام نمی‌شود."
+                        label="Ø±Ø¯ ØºØ±Ø¨Ø§Ù„Ú¯Ø±ÛŒ"
+                        description="screen_fail â€” Ø§Ù‡Ø¯Ø§ Ø§Ù†Ø¬Ø§Ù… Ù†Ù…ÛŒâ€ŒØ´ÙˆØ¯."
                         icon={<Prohibit size={18} />}
                         color="red"
                         onClick={() => handleProgress('screen_fail')}
@@ -404,21 +404,21 @@ export function DonorPage() {
 
                   {selectedDonor.status === 'screen_pass' && (
                     <Stack gap="sm">
-                      <InlineMessage tone="warning" title="تنها اقدام مؤثر بر تأمین">
-                        ثبت «اهدای واقعی» تنها عملیاتی است که یک واحد به مقدار تأمین‌شده اضافه می‌کند. پیش از
-                        ثبت، از انجام اهدا و ثبت معتبر رویداد مطمئن شوید.
+                      <InlineMessage tone="warning" title="ØªÙ†Ù‡Ø§ Ø§Ù‚Ø¯Ø§Ù… Ù…Ø¤Ø«Ø± Ø¨Ø± ØªØ£Ù…ÛŒÙ†">
+                        Ø«Ø¨Øª Â«Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒÂ» ØªÙ†Ù‡Ø§ Ø¹Ù…Ù„ÛŒØ§ØªÛŒ Ø§Ø³Øª Ú©Ù‡ ÛŒÚ© ÙˆØ§Ø­Ø¯ Ø¨Ù‡ Ù…Ù‚Ø¯Ø§Ø± ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ø§Ø¶Ø§ÙÙ‡ Ù…ÛŒâ€ŒÚ©Ù†Ø¯. Ù¾ÛŒØ´ Ø§Ø²
+                        Ø«Ø¨ØªØŒ Ø§Ø² Ø§Ù†Ø¬Ø§Ù… Ø§Ù‡Ø¯Ø§ Ùˆ Ø«Ø¨Øª Ù…Ø¹ØªØ¨Ø± Ø±ÙˆÛŒØ¯Ø§Ø¯ Ù…Ø·Ù…Ø¦Ù† Ø´ÙˆÛŒØ¯.
                       </InlineMessage>
                       <Group gap="sm" grow>
                         <ProgressButton
-                          label="ثبت اهدای واقعی"
-                          description="donated — supplied +۱ و fulfilled +۱."
+                          label="Ø«Ø¨Øª Ø§Ù‡Ø¯Ø§ÛŒ ÙˆØ§Ù‚Ø¹ÛŒ"
+                          description="donated â€” supplied +Û± Ùˆ fulfilled +Û±."
                           icon={<FirstAidKit size={18} />}
                           color="green"
                           onClick={() => handleProgress('donated')}
                         />
                         <ProgressButton
-                          label="عدم مراجعه"
-                          description="no_show — تأمین‌شده بدون تغییر."
+                          label="Ø¹Ø¯Ù… Ù…Ø±Ø§Ø¬Ø¹Ù‡"
+                          description="no_show â€” ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ Ø¨Ø¯ÙˆÙ† ØªØºÛŒÛŒØ±."
                           icon={<X size={18} />}
                           color="gray"
                           onClick={() => handleProgress('no_show')}
@@ -428,25 +428,25 @@ export function DonorPage() {
                   )}
 
                   {['declined', 'screen_fail', 'no_show', 'donated'].includes(selectedDonor.status) && (
-                    <InlineMessage tone={selectedDonor.status === 'donated' ? 'success' : 'info'} title="مسیر این اهداکننده بسته شده است">
-                      وضعیت نهایی: {DONOR_STATUS_LABELS[selectedDonor.status]}. در این وضعیت گذار دیگری در نمایش
-                      مجاز نیست.
+                    <InlineMessage tone={selectedDonor.status === 'donated' ? 'success' : 'info'} title="Ù…Ø³ÛŒØ± Ø§ÛŒÙ† Ø§Ù‡Ø¯Ø§Ú©Ù†Ù†Ø¯Ù‡ Ø¨Ø³ØªÙ‡ Ø´Ø¯Ù‡ Ø§Ø³Øª">
+                      ÙˆØ¶Ø¹ÛŒØª Ù†Ù‡Ø§ÛŒÛŒ: {DONOR_STATUS_LABELS[selectedDonor.status]}. Ø¯Ø± Ø§ÛŒÙ† ÙˆØ¶Ø¹ÛŒØª Ú¯Ø°Ø§Ø± Ø¯ÛŒÚ¯Ø±ÛŒ Ø¯Ø± Ù†Ù…Ø§ÛŒØ´
+                      Ù…Ø¬Ø§Ø² Ù†ÛŒØ³Øª.
                     </InlineMessage>
                   )}
                 </Stack>
               </SectionCard>
 
               {request && (
-                <SectionCard title="خلاصه تأمین درخواست مرتبط" description="پنج کمیت را با هم اشتباه نگیرید">
+                <SectionCard title="Ø®Ù„Ø§ØµÙ‡ ØªØ£Ù…ÛŒÙ† Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…Ø±ØªØ¨Ø·" description="Ù¾Ù†Ø¬ Ú©Ù…ÛŒØª Ø±Ø§ Ø¨Ø§ Ù‡Ù… Ø§Ø´ØªØ¨Ø§Ù‡ Ù†Ú¯ÛŒØ±ÛŒØ¯">
                   <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} spacing="sm">
-                    <MiniStat label="درخواستی" value={formatUnits(request.units)} />
-                    <MiniStat label="تخصیص‌یافته" value={formatUnits(request.allocated_units)} />
-                    <MiniStat label="واقعاً تأمین‌شده" value={formatUnits(request.supplied_units)} tone="green" />
-                    <MiniStat label="باقی‌مانده" value={formatUnits(remainingUnits(request))} tone="orange" />
+                    <MiniStat label="Ø¯Ø±Ø®ÙˆØ§Ø³ØªÛŒ" value={formatUnits(request.units)} />
+                    <MiniStat label="ØªØ®ØµÛŒØµâ€ŒÛŒØ§ÙØªÙ‡" value={formatUnits(request.allocated_units)} />
+                    <MiniStat label="ÙˆØ§Ù‚Ø¹Ø§Ù‹ ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡" value={formatUnits(request.supplied_units)} tone="green" />
+                    <MiniStat label="Ø¨Ø§Ù‚ÛŒâ€ŒÙ…Ø§Ù†Ø¯Ù‡" value={formatUnits(remainingUnits(request))} tone="orange" />
                   </SimpleGrid>
                   <Text size="xs" c="dimmed" mt="sm" lh={1.75}>
-                    تأمین‌شده فقط از رویدادهای <span className="bn-mono bn-ltr">donated</span> می‌آید. تخصیص
-                    موجودی و پذیرش دعوت در این عدد اثری ندارند.
+                    ØªØ£Ù…ÛŒÙ†â€ŒØ´Ø¯Ù‡ ÙÙ‚Ø· Ø§Ø² Ø±ÙˆÛŒØ¯Ø§Ø¯Ù‡Ø§ÛŒ <span className="bn-mono bn-ltr">donated</span> Ù…ÛŒâ€ŒØ¢ÛŒØ¯. ØªØ®ØµÛŒØµ
+                    Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ùˆ Ù¾Ø°ÛŒØ±Ø´ Ø¯Ø¹ÙˆØª Ø¯Ø± Ø§ÛŒÙ† Ø¹Ø¯Ø¯ Ø§Ø«Ø±ÛŒ Ù†Ø¯Ø§Ø±Ù†Ø¯.
                   </Text>
                 </SectionCard>
               )}
@@ -454,8 +454,8 @@ export function DonorPage() {
               <Group gap={6} align="flex-start" c="dimmed">
                 <WarningCircle size={17} aria-hidden="true" />
                 <Text size="xs" lh={1.7}>
-                  این پورتال نمایشی است و پیام Gateway واقعی ارسال نمی‌کند. داده‌ها ساختگی‌اند و مبنای تصمیم
-                  پزشکی نیستند.
+                  Ø§ÛŒÙ† Ù¾ÙˆØ±ØªØ§Ù„ Ù†Ù…Ø§ÛŒØ´ÛŒ Ø§Ø³Øª Ùˆ Ù¾ÛŒØ§Ù… Gateway ÙˆØ§Ù‚Ø¹ÛŒ Ø§Ø±Ø³Ø§Ù„ Ù†Ù…ÛŒâ€ŒÚ©Ù†Ø¯. Ø¯Ø§Ø¯Ù‡â€ŒÙ‡Ø§ Ø³Ø§Ø®ØªÚ¯ÛŒâ€ŒØ§Ù†Ø¯ Ùˆ Ù…Ø¨Ù†Ø§ÛŒ ØªØµÙ…ÛŒÙ…
+                  Ù¾Ø²Ø´Ú©ÛŒ Ù†ÛŒØ³ØªÙ†Ø¯.
                 </Text>
               </Group>
             </Stack>
@@ -524,7 +524,7 @@ function ProgressButton({
 
 function MiniStat({ label, value, tone = 'brand' }: { label: string; value: string; tone?: string }) {
   return (
-    <Box className="rounded-lg border border-[var(--bn-border)] bg-[#F9FCFB] p-3">
+    <Box className="rounded-lg border border-[var(--bn-border)] bg-[#fff8f8] p-3">
       <Text size="xs" c="dimmed">
         {label}
       </Text>
@@ -534,3 +534,4 @@ function MiniStat({ label, value, tone = 'brand' }: { label: string; value: stri
     </Box>
   );
 }
+

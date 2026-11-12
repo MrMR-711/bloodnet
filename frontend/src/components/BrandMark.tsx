@@ -1,4 +1,4 @@
-import { useId } from 'react';
+﻿import { useId } from 'react';
 
 interface BrandMarkProps {
   size?: number;
@@ -21,9 +21,9 @@ export function BrandMark({ size = 40, className }: BrandMarkProps) {
     >
       <defs>
         <linearGradient id={gradientId} x1="12" y1="8" x2="52" y2="58" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0F766E" />
-          <stop offset="0.55" stopColor="#0E7490" />
-          <stop offset="1" stopColor="#0B3B46" />
+          <stop stopColor="#b91c1c" />
+          <stop offset="0.55" stopColor="#be123c" />
+          <stop offset="1" stopColor="#7f1d1d" />
         </linearGradient>
       </defs>
       <path
@@ -60,3 +60,4 @@ export function BrandMark({ size = 40, className }: BrandMarkProps) {
     </svg>
   );
 }
+
