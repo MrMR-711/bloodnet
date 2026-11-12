@@ -1,10 +1,11 @@
 # BloodNet — مخزن مستقل محصول
 
-**وضعیت:** `SKELETON ONLY — IMPLEMENTATION NOT STARTED`
+**وضعیت:** `FRONTEND DEMO IMPLEMENTED — BACKEND DECIDED, NOT IMPLEMENTED`
 
-این مخزن، مخزن مشترک محصول تیم برای چالش BloodNet است. در این مرحله فقط
-محیط Git، ساختار پوشه‌ها و منابع عمومی رسمی آماده شده‌اند. هیچ Backend،
-Frontend، API اجرایی، Database، Migration یا UI واقعی ساخته نشده است.
+این مخزن، مخزن مشترک محصول تیم برای چالش BloodNet است. Frontend واقعی با
+React، Tailwind CSS، Mantine، فارسی و RTL ساخته شده و در حالت نمایشی با داده
+محلی اجرا می‌شود. پشته Backend تصمیم‌گیری و مستند شده است، اما هیچ API
+اجرایی، Database، Migration یا جریان واقعی Backend هنوز ساخته نشده است.
 
 ## دامنه فعلی
 
@@ -26,8 +27,8 @@ Frontend، API اجرایی، Database، Migration یا UI واقعی ساخته
 
 ```text
 bloodnet/
-├── backend/            # محل کد Backend (فعلاً فقط Placeholder)
-├── frontend/           # محل کد Frontend (فعلاً فقط Placeholder)
+├── backend/            # تصمیم‌ها و Placeholder؛ بدون کد اجرایی
+├── frontend/           # اپلیکیشن React + Tailwind + Mantine (حالت نمایشی)
 ├── docs/               # مستندات Bootstrap، Git و وضعیت محیط
 ├── participant_kit/    # منابع رسمی کپی‌شده بدون تغییر
 ├── harness/            # Harness رسمی کپی‌شده بدون تغییر
@@ -67,9 +68,21 @@ bloodnet/
 
 ## اجرا
 
-در این مرحله محصول اجرایی وجود ندارد. راهنمای اجرای محلی فقط پس از تأیید
-معماری و پیاده‌سازی محصول نوشته می‌شود. دستورهای موجود در منابع کیت برای
-Practice و Harness هستند و اجرای محصول محسوب نمی‌شوند.
+Frontend در حالت نمایشی قابل اجراست:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+رابط روی `http://localhost:5173` بالا می‌آید. داده‌ها در `localStorage` شبیه‌سازی
+می‌شوند و هیچ درخواستی به Backend واقعی ارسال نمی‌شود. جزئیات در
+[`frontend/README.md`](frontend/README.md) آمده است.
+
+Backend هنوز اجرایی نیست. تصمیم‌های قطعی آن در
+[`docs/technology-decisions.md`](docs/technology-decisions.md) ثبت شده‌اند. دستورهای
+موجود در منابع کیت برای Practice و Harness هستند و اجرای محصول محسوب نمی‌شوند.
 
 ## قواعد کلیدی
 

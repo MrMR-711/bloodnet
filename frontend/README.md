@@ -1,12 +1,120 @@
-# Frontend — Placeholder
+# BloodNet — Frontend
 
-این پوشه محل کد Frontend محصول است. در وضعیت فعلی هیچ React code، Build Tool،
-Dependency، Theme یا UI واقعی در آن وجود ندارد.
+رابط کاربری فارسی و RTL برای هماهنگی اهدای خون. این بخش در **حالت نمایشی** اجرا می‌شود و داده‌ها را در
+`localStorage` نگه می‌دارد؛ Backend محصول هنوز پیاده‌سازی نشده است.
 
-- مالک Branch: `Reza-zahedi`
-- Email: `zahdireza6327@gmail.com`
-- تصمیم قطعی: React + Tailwind CSS + Mantine + فارسی RTL
-- وضعیت پیاده‌سازی: `NOT STARTED`
+> داده‌ها ساختگی‌اند و این محصول مشاوره یا تصمیم پزشکی ارائه نمی‌دهد.
 
-نسخه‌های React/Tailwind/Mantine، TypeScript یا JavaScript، Build Tool، Font،
-Theme و Color Tokens هنوز `NOT DECIDED` هستند و نباید حدس زده شوند.
+## پشته فنی
+
+| ابزار | نسخه | نقش |
+|---|---|---|
+| React / React DOM | `19.3.1` | رابط کاربری |
+| TypeScript | `5.9.3` | تایپ استاتیک |
+| Vite | `8.3.8` | توسعه و build |
+| Tailwind CSS | `4.3.5` | utility و توکن‌های ظاهری |
+| Mantine | `9.8.0` | کامپوننت‌های دسترس‌پذیر و RTL |
+| React Router DOM | `7.18.5` | مسیربندی |
+| Phosphor Icons | `2.1.10` | آیکون‌های برداری |
+| Vazirmatn Variable | `5.3.0` | فونت فارسی |
+
+## اجرا
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+توسعه روی `http://localhost:5173` اجرا می‌شود. مسیر `/api` در Vite به `http://localhost:8000` پروکسی می‌شود
+و پیشوند `/api` حذف می‌شود.
+
+```bash
+npm run typecheck
+npm run build
+npm run preview
+```
+
+## متغیرهای محیط
+
+```env
+VITE_DEMO_MODE=true
+VITE_API_BASE_URL=/api
+```
+
+هیچ توکن، رمز عبور، PAT یا کلید خصوصی در Frontend ذخیره نمی‌شود. توکن‌های دمو در قرارداد رسمی مقدار ثابت
+دارند و راز واقعی نیستند.
+
+## معماری
+
+```
+src/
+├── components/      # AppLayout، کارت‌ها، نشان‌ها، جدول درخواست‌ها
+├── data/            # seed داده نمایشی و DemoStoreContext
+├── lib/             # برچسب‌ها، قالب‌بندی تاریخ/عدد، شناسه‌ها
+├── pages/           # داشبورد، درخواست‌ها، موجودی، اهداکننده، audit، راهنما
+├── styles/          # Tailwind 4 + لایه‌های Mantine + توکن‌ها
+├── types/           # انواع دامنه و ماتریس سازگاری رسمی
+├── App.tsx          # مسیرها
+├── main.tsx         # RTL، Mantine، Notifications، Store
+└── theme.ts         # تم Mantine و پالت برند
+```
+
+### مسیرها
+
+- `/` — داشبورد عملیات و شاخص‌ها
+- `/requests` — فهرست و فیلتر درخواست‌ها
+- `/requests/new` — ثبت درخواست جدید
+- `/requests/:requestId` — جزئیات، پنج کمیت، اقدام‌ها و timeline
+- `/inventory` — موجودی مراکز، FEFO و dispatch
+- `/donor` — پورتال اهداکننده و گذارهای مجاز
+- `/audit` — گزارش رویدادها و خروجی JSON
+- `/guide` — راهنمای فنی و قرارداد
+
+## قواعد دامنه‌ای که در UI رعایت شده‌اند
+
+- پنج کمیت مستقل با برچسب‌های جدا: مقدار درخواستی، موجودی سازگار قابل تخصیص، مقدار تخصیص‌یافته، مقدار
+  واقعاً تأمین‌شده و مقدار باقی‌مانده.
+- فقط رویداد `donated` مقدار تأمین‌شده را افزایش می‌دهد. پذیرش دعوت، حرکت، رسیدن، غربالگری، تخصیص موجودی
+  و تحویل پیام Gateway اهدا محسوب نمی‌شوند.
+- محصولات فقط `red_cells`، `platelets` و `plasma` هستند. فیلد رسمی `product` است و `product_type` ارسال
+  نمی‌شود.
+- وضعیت‌های رسمی: `pending_review`، `open`، `mobilizing`، `partially_fulfilled`، `fulfilled`، `cancelled`
+  و `expired`.
+- تخصیص موجودی با FEFO، بررسی سازگاری از `participant_kit/compat.yaml` و expiry انجام می‌شود.
+- برای ثبت درخواست، `Idempotency-Key` با طول مجاز 1 تا 128 ساخته و نمایش داده می‌شود.
+- زمان‌ها بر مبنای ساعت شبیه‌سازی و epoch `2027-01-15T00:00:00+03:30` نمایش داده می‌شوند.
+
+## حالت نمایشی و حالت زنده
+
+در حالت فعلی، `DemoStoreContext` تمام گذارها را در حافظه و `localStorage` شبیه‌سازی می‌کند. این کار برای
+بازبینی UI و مسیرهای کاربری است، نه اثبات صحت Backend.
+
+OpenAPI رسمی endpoint فهرست کامل درخواست‌ها را ندارد. فهرست و داشبورد فعلی از داده seed می‌آیند. برای حالت
+زنده باید endpoint داخلی یا تجمیع سمت محصول اضافه شود و adapter قرارداد به `VITE_API_BASE_URL` متصل شود.
+تا آن زمان ادعای اتصال کامل به جریان واقعی (AC-014) معتبر نیست.
+
+## دسترس‌پذیری و RTL
+
+- `<html lang="fa" dir="rtl">` و `DirectionProvider` Mantine
+- فونت Vazirmatn و اعداد فارسی در نمایش
+- برچسب فرم‌ها، پیام خطا، `aria-live` برای تغییرات مهم، فوکوس قابل مشاهده
+- حداقل هدف لمسی 44 پیکسل، کنتراست متن و احترام به `prefers-reduced-motion`
+- جدول‌ها در موبایل به کارت تبدیل می‌شوند و شناسه‌های فنی LTR نمایش داده می‌شوند
+
+## تصمیم‌های Backend (مستند، بدون پیاده‌سازی)
+
+Python `3.14.7`، FastAPI `0.162.5`، Uvicorn `0.54.0`، SQLAlchemy `2.1.8`، SQLite با WAL و
+`foreign_keys`، Alembic `1.20.1`، Pydantic `2.14.3`، httpx `0.28.1` و pytest `9.2.0`. سرویس محصول روی
+پورت `8000` و Mockها روی `9100`/`9200`/`9300` اجرا می‌شوند. SQLite برای دموی محلی انتخاب شده و مسیر مهاجرت
+به PostgreSQL باید مستند شود. جزئیات در `../docs/technology-decisions.md`.
+
+Smart Service به‌صورت یک ماژول مشورتی قطعی و قابل توضیح بر پایه قواعد، بدون LLM و بدون تصمیم پزشکی تصمیم‌گیری
+شده و در این مرحله پیاده‌سازی نشده است.
+
+## مستندات
+
+- `../docs/technology-decisions.md`
+- `../docs/git-workflow.md`
+- `../participant_kit/openapi.yaml`
+- `../participant_kit/compat.yaml`
