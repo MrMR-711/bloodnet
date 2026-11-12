@@ -33,12 +33,19 @@ coverage/
 
 # ===== Runtime / Practice outputs =====
 run_out/
+run_out*/
 out/
 outputs/
 *.log
 *.sqlite3
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
+backend/data/
+backend/replay.json
+backend/req*.json
+gateway_log.jsonl
 
 # ===== OS / Editor =====
 .DS_Store
