@@ -1,0 +1,13 @@
+# Official kit files must keep their exact bytes (no EOL normalization).
+* text=auto
+participant_kit/** -text
+harness/** -text
+examples/** -text
+tests/** -text
+PRACTICE.md -text
+SERVICES.md -text
+PARTICIPANT_README.md -text
+RELEASE_NOTES.md -text
+requirements.txt -text
+.env.example -text
+SOURCE-MANIFEST.sha256 -text
