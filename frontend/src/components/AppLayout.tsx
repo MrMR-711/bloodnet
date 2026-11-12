@@ -114,16 +114,21 @@ export function AppLayout() {
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/health')
-      .then((response) => response.json())
-      .then((body) => {
-        if (alive) setApiStatus(body?.ok ? 'online' : 'offline');
-      })
-      .catch(() => {
-        if (alive) setApiStatus('offline');
-      });
+    const check = () => {
+      fetch('/api/health', { cache: 'no-store' })
+        .then((response) => response.json())
+        .then((body) => {
+          if (alive) setApiStatus(body?.ok ? 'online' : 'offline');
+        })
+        .catch(() => {
+          if (alive) setApiStatus('offline');
+        });
+    };
+    check();
+    const timer = window.setInterval(check, 15000);
     return () => {
       alive = false;
+      window.clearInterval(timer);
     };
   }, []);
 
