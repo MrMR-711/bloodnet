@@ -79,7 +79,7 @@ python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 - Auth فعلی Demo Token است.
 - Scheduler انقضای خودکار و Observability کامل باقی مانده است.
 - Smart Service توصیه‌ای و قاعده‌محور است، نه تشخیص پزشکی.
-- نتیجه Smoke به Seed و سناریو وابسته است. Seed 4000 امتیاز 98.8 و Critical SLA برابر 1.0 داد؛ Seed 4001 با همان کد 70.5 و Critical SLA برابر 0.333 داد.
+- نتیجه Smoke به Seed و سناریو وابسته است. دو اجرای Seed 4000 با کد نهایی امتیازهای 95.7 و 98.8 و Critical SLA برابر 1.0 دادند؛ Seed 4001 با همان کد 70.5 و Critical SLA برابر 0.333 داد.
 - در Seed 4001، یک درخواست Critical پلاکت O+ به‌دلیل نبود موجودی سازگار و زمان ۹۰ دقیقه‌ای Apheresis از نظر فیزیکی در SLA 90 دقیقه‌ای قابل تحقق نبود؛ این محدودیت داده/فرایند است، نه تأخیر پردازش.
 
 ## Git
