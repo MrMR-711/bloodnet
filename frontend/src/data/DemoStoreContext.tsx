@@ -319,16 +319,20 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [health, requestsResponse, inventoryResponse, catalogResponse, auditResponse, donorsResponse] =
-        await Promise.all([
-          getHealth(),
-          getRequests(),
-          getInventory(),
-          getCatalog(),
-          getAudit(),
-          getDonors(),
-        ]);
+      const [health, requestsResponse, catalogResponse] = await Promise.all([
+        getHealth(),
+        getRequests(),
+        getCatalog(),
+      ]);
       if (!health.ok) throw new ApiError(503, 'Backend آماده نیست.');
+
+      // موجودی، Audit و اهداکنندگان سرویس‌های جانبی‌اند؛ قطع آن‌ها نباید
+      // داده‌های اصلی زنده را به حالت نمایشی برگرداند.
+      const [inventoryResponse, auditResponse, donorsResponse] = await Promise.all([
+        getInventory().catch(() => null),
+        getAudit().catch(() => null),
+        getDonors().catch(() => null),
+      ]);
 
       const centers = toCenters(catalogResponse);
       const hospitals = toHospitals(catalogResponse, centers);
@@ -341,8 +345,10 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
         const request = requests.find((entry) => entry.id === detail.request_id);
         return request ? detail.dispatches.map((item) => mapDispatch(item, request, centers)) : [];
       });
-      const donors = donorsResponse.items.map((item) => mapDonor(item, requests, dispatches, centers));
-      const audit = auditResponse.items.map(mapAudit);
+      const donors = (donorsResponse?.items ?? []).map((item) =>
+        mapDonor(item, requests, dispatches, centers),
+      );
+      const audit = (auditResponse?.items ?? []).map(mapAudit);
       const latestSim = requestsResponse.items.reduce(
         (max, item) => Math.max(max, item.updated_sim, item.created_sim),
         0,
@@ -353,13 +359,17 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
         version: 1,
         sim_time: isoFromSimMinute(latestSim),
         requests,
-        inventory: inventoryResponse.items.map((item) => mapInventory(item, centers)),
+        inventory: (inventoryResponse?.items ?? []).map((item) => mapInventory(item, centers)),
         donors,
         dispatches,
         audit,
       });
       setMode('live');
-      setError(null);
+      setError(
+        [inventoryResponse, auditResponse, donorsResponse].some((response) => response === null)
+          ? 'برخی سرویس‌های جانبی در دسترس نیستند؛ درخواست‌ها و کاتالوگ زنده‌اند.'
+          : null,
+      );
     } catch (cause) {
       setMode('demo');
       setError(cause instanceof Error ? cause.message : 'اتصال به API برقرار نشد.');

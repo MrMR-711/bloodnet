@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   ActionIcon,
+  Alert,
   AppShell,
   Avatar,
   Badge,
@@ -108,7 +109,7 @@ export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const [resetOpen, resetModal] = useDisclosure();
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
-  const { state, mode, resetDemo } = useDemoStore();
+  const { state, mode, error, resetDemo } = useDemoStore();
   const { pathname } = useLocation();
   const meta = pageMeta(pathname);
 
@@ -412,6 +413,11 @@ export function AppLayout() {
       <AppShell.Main className="bn-app-bg">
         <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
           {mode === 'demo' ? <DemoBanner /> : null}
+          {mode === 'live' && error ? (
+            <Alert color="yellow" variant="light" mb="md" title="هشدار اتصال">
+              {error}
+            </Alert>
+          ) : null}
           <Outlet />
           <Group
             justify="space-between"

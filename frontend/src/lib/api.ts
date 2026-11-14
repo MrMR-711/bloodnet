@@ -140,6 +140,7 @@ async function request<T>(
     method: options.method ?? 'GET',
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    signal: AbortSignal.timeout(8000),
   });
 
   if (!response.ok) {
