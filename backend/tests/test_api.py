@@ -10,7 +10,7 @@ os.environ.setdefault("KIT_PATH", str(Path(__file__).resolve().parents[2] / "par
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import event, select
 
 from app.db import Base, SessionLocal, engine
 from app.main import app
@@ -240,6 +240,169 @@ def test_out_of_order_callbacks_do_not_double_count(client, monkeypatch):
     assert state["status"] == "partially_fulfilled"
 
 
+def test_planned_request_reserves_stock_for_pending_critical(client, monkeypatch):
+    calls = []
+
+    def fake_inventory():
+        return [{
+            "center_id": "MC1",
+            "blood_group": "O+",
+            "product": "red_cells",
+            "units": 2,
+            "expires_sim_min": 500,
+        }]
+
+    def fake_dispatch(payload):
+        calls.append(payload)
+        return 201, {
+            "dispatch_id": payload["dispatch_id"],
+            "units": payload["units"],
+            "eta_sim_min": 15,
+        }
+
+    monkeypatch.setattr("app.services.inventory_items", fake_inventory)
+    monkeypatch.setattr("app.services.dispatch_stock", fake_dispatch)
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+
+    critical = create(client, key="critical-waiting", units=1, urgency="critical").json()
+    planned = create(client, key="planned-first", units=1, urgency="planned").json()
+
+    planned_approval = client.post(
+        f"/requests/{planned['request_id']}/approve",
+        headers={**COORDINATOR, "X-Sim-Time": "20"},
+        json={},
+    )
+    assert planned_approval.status_code == 200
+    with SessionLocal() as db:
+        planned_row = db.get(Request, planned["request_id"])
+        assert planned_row.allocated_units == 0
+    assert calls == []
+
+    critical_approval = client.post(
+        f"/requests/{critical['request_id']}/approve",
+        headers={**COORDINATOR, "X-Sim-Time": "21"},
+        json={},
+    )
+    assert critical_approval.status_code == 200
+    with SessionLocal() as db:
+        critical_row = db.get(Request, critical["request_id"])
+        assert critical_row.allocated_units == 1
+    assert len(calls) == 1
+
+
+def test_planned_request_leaves_critical_safety_stock(client, monkeypatch):
+    stock = {"units": 2}
+    calls = []
+
+    def fake_inventory():
+        if stock["units"] <= 0:
+            return []
+        return [{
+            "center_id": "MC1",
+            "blood_group": "O+",
+            "product": "red_cells",
+            "units": stock["units"],
+            "expires_sim_min": 500,
+        }]
+
+    def fake_dispatch(payload):
+        calls.append(payload)
+        stock["units"] -= payload["units"]
+        return 201, {
+            "dispatch_id": payload["dispatch_id"],
+            "units": payload["units"],
+            "eta_sim_min": 15,
+        }
+
+    monkeypatch.setattr("app.services.inventory_items", fake_inventory)
+    monkeypatch.setattr("app.services.dispatch_stock", fake_dispatch)
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+
+    planned = create(client, key="planned-safety", units=2, urgency="planned").json()
+    planned_approval = client.post(
+        f"/requests/{planned['request_id']}/approve",
+        headers={**COORDINATOR, "X-Sim-Time": "20"},
+        json={},
+    )
+    assert planned_approval.status_code == 200
+    with SessionLocal() as db:
+        planned_row = db.get(Request, planned["request_id"])
+        assert planned_row.allocated_units == 1
+    assert stock["units"] == 1
+
+    critical = create(client, key="critical-after-planned", units=1, urgency="critical").json()
+    critical_approval = client.post(
+        f"/requests/{critical['request_id']}/approve",
+        headers={**COORDINATOR, "X-Sim-Time": "21"},
+        json={},
+    )
+    assert critical_approval.status_code == 200
+    with SessionLocal() as db:
+        critical_row = db.get(Request, critical["request_id"])
+        assert critical_row.allocated_units == 1
+    assert stock["units"] == 0
+    assert len(calls) == 2
+
+
+def test_critical_skips_stock_that_cannot_meet_sla(client, monkeypatch):
+    calls = []
+
+    def fake_inventory():
+        return [{
+            "center_id": "MC2",
+            "blood_group": "O+",
+            "product": "red_cells",
+            "units": 1,
+            "expires_sim_min": 500,
+        }]
+
+    def fake_dispatch(payload):
+        calls.append(payload)
+        return 201, {
+            "dispatch_id": payload["dispatch_id"],
+            "units": payload["units"],
+            "eta_sim_min": 200,
+        }
+
+    monkeypatch.setattr("app.services.inventory_items", fake_inventory)
+    monkeypatch.setattr("app.services.dispatch_stock", fake_dispatch)
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+    monkeypatch.setattr("app.services.travel_minutes", lambda origin, destination: 200.0)
+
+    critical = create(client, key="critical-far-stock", units=1, urgency="critical").json()
+    approval = client.post(
+        f"/requests/{critical['request_id']}/approve",
+        headers={**COORDINATOR, "X-Sim-Time": "20"},
+        json={},
+    )
+    assert approval.status_code == 200
+    with SessionLocal() as db:
+        row = db.get(Request, critical["request_id"])
+        assert row.allocated_units == 0
+    assert calls == []
+
+
+def test_pick_donors_batches_donation_history(client):
+    from app.services import _pick_donors
+
+    created = create(client, key="pick-donors-batch", units=1, urgency="planned").json()
+    statements: list[str] = []
+
+    def capture(_conn, _cursor, statement, _parameters, _context, _executemany):
+        statements.append(statement)
+
+    with SessionLocal() as db:
+        req = db.get(Request, created["request_id"])
+        event.listen(engine, "before_cursor_execute", capture)
+        try:
+            donors = _pick_donors(db, req, 20.0, 10)
+        finally:
+            event.remove(engine, "before_cursor_execute", capture)
+
+    assert len(donors) == 10
+    assert len(statements) <= 6
+
+
 def test_cancel_twice_and_amend(client):
     created = create(client)
     rid = created.json()["request_id"]
@@ -386,6 +549,22 @@ def test_two_donations_cannot_overfill_request(client, monkeypatch):
     assert state["supplied_units"] == 1
     assert state["fulfilled"] == 1
     assert state["status"] == "fulfilled"
+
+
+def test_critical_wave_has_safety_margin(client, monkeypatch):
+    monkeypatch.setattr("app.services.inventory_items", lambda: [])
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+    rid = create(client, key="critical-wave-margin", units=1, urgency="critical").json()["request_id"]
+    assert client.post(
+        f"/requests/{rid}/approve",
+        headers={**COORDINATOR, "X-Sim-Time": "20"},
+        json={},
+    ).status_code == 200
+    with SessionLocal() as db:
+        donors = db.scalars(select(Notification).where(
+            Notification.request_id == rid, Notification.template == "request_wave"
+        )).all()
+        assert len(donors) >= 6
 
 
 def test_unhandled_error_keeps_request_id_and_cors(monkeypatch):

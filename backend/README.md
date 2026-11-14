@@ -60,25 +60,30 @@ python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 
 - ثبت درخواست با `Idempotency-Key` و پاسخ تکرارپذیر
 - چرخه وضعیت درخواست: `pending_review`، `open`، `mobilizing`، `partially_fulfilled`، `fulfilled`، `cancelled`
-- تخصیص موجودی با FEFO برای درخواست‌های planned و اولویت فاصله برای critical/urgent
+- تخصیص موجودی با FEFO برای درخواست‌های planned و اولویت ETA/فاصله برای critical/urgent
+- رزرو حداقل یک واحد موجودی برای درخواست بحرانی آینده و دو واحد برای هر درخواست بحرانی در انتظار
+- رد واحدهای موجودی دوردستی که ETA آن‌ها از SLA باقی‌مانده بیشتر است
 - Dispatch سریال‌شده در یک Process؛ جلوگیری از تخصیص دوباره و تعارض `dispatch_id`
 - جلوگیری از Overfill در دو اهدا و Dispatch بیش از باقی‌مانده درخواست
 - Callbackهای اهداکننده با `event_id` یکتا و جلوگیری از شمارش دوباره
 - فقط رویداد `donated` مقدار `supplied_units` را افزایش می‌دهد
+- انتخاب اهداکننده با تاریخچه اهدای دسته‌ای (بدون N+1 Query)
 - Smart Service قاعده‌محور و Deterministic با خروجی قابل توضیح
 - `X-Request-ID` اعتبارسنجی‌شده روی همه پاسخ‌ها و Readiness Probe
+- Endpointهای خواندنی UI: `/catalog`، `/audit`، `/donors`
 
 ## محدودیت‌های صادقانه
 
 - قفل‌های `threading.Lock` فقط در یک Process معتبرند؛ برای چند Worker به قفل دیتابیسی/صف نیاز است.
 - قفل Dispatch در یک Process نگه داشته می‌شود و I/O خارجی را هم پوشش می‌دهد؛ Production به تراکنش/رزرو اتمی و Timeout کوتاه‌تر نیاز دارد.
 - اگر دو اهداکننده هم‌زمان در مسیر باشند، ممکن است اهدای فیزیکی دوم هم ثبت شود؛ شمارنده‌های درخواست از سقف عبور نمی‌کنند و دعوت‌های بعدی متوقف می‌شوند.
-- در Smokeهای محلی، امتیاز بسته به Seed و سناریو بین ۵۶ تا ۹۹ متغیر بود؛ Safety/Overfill/Incompatible در اجرای ۱۲ درخواستی صفر ماند، اما Critical SLA همچنان نقطه ضعف است.
+- نتیجه Smoke به Seed و سناریو وابسته است. Seed 4000: امتیاز 98.8 و Critical SLA برابر 1.0. Seed 4001 با همان کد: امتیاز 70.5 و Critical SLA برابر 0.333.
+- در Seed 4001، درخواست Critical پلاکت O+ به‌دلیل نبود موجودی سازگار و زمان ۹۰ دقیقه‌ای Apheresis در SLA 90 دقیقه‌ای قابل تحقق نبود؛ محدودیت داده و فرایند است، نه کندی Query یا Dispatch.
 - SQLite برای Demo مناسب است؛ Production به PostgreSQL، Backup و Pooling نیاز دارد.
 - Auth فعلی Demo Token است؛ OAuth2/OIDC، Rate Limit و امضای Callback ندارد.
 - Scheduler انقضای خودکار درخواست پیاده نشده است.
 - Observability کامل (Metrics/Tracing/Alerting) باقی مانده است.
-- Frontend فعلاً داده Demo دارد و فقط سلامت API را بررسی می‌کند.
+- Frontend در حالت پیش‌فرض به API وصل است و در نبود آن به داده Demo برمی‌گردد؛ نام نمایشی اهداکنندگان از شناسه ساخته می‌شود.
 
 ## منابع
 

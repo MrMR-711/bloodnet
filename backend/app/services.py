@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
-from .clients import dispatch_stock, gateway_clock, inventory_items, send_message
+from .clients import dispatch_stock, gateway_clock, inventory_items, send_message, travel_minutes
 from .config import settings
 from .data import BLOOD_GROUPS, donor_eligible, is_compatible, km_between, load_kit
 from .errors import ApiError
@@ -188,6 +188,11 @@ def _pick_donors(db, req: Request, sim: float, limit: int) -> list:
     busy = set(db.scalars(select(Notification.donor_id).where(
         Notification.template == "request_wave", Notification.active.is_(True), Notification.response == "accepted"
     )).all())
+    last_donations = dict(db.execute(
+        select(DonorEvent.donor_id, func.max(DonorEvent.sim_time))
+        .where(DonorEvent.event == "donated")
+        .group_by(DonorEvent.donor_id)
+    ).all())
     candidates = []
     for donor in kit.donors:
         if donor.donor_id in already or donor.donor_id in busy:
@@ -196,9 +201,7 @@ def _pick_donors(db, req: Request, sim: float, limit: int) -> list:
             continue
         if not donor_eligible(donor, req.product, sim):
             continue
-        last_donated = db.scalar(select(func.max(DonorEvent.sim_time)).where(
-            DonorEvent.donor_id == donor.donor_id, DonorEvent.event == "donated"
-        ))
+        last_donated = last_donations.get(donor.donor_id)
         if last_donated is not None:
             interval_days = (
                 (60 if donor.sex == "M" else 90) if req.product == "red_cells" else 14
@@ -227,24 +230,67 @@ def activate_request(db, request_id: str) -> None:
             and item.get("units", 0) > 0
             and is_compatible(req.product, item.get("blood_group", ""), req.blood_group)
         ]
-        items.sort(key=lambda item: (
-            (km_between(
-                hospital.lat, hospital.lon,
-                kit.centers[item["center_id"]].lat, kit.centers[item["center_id"]].lon,
-            ) if hospital and item.get("center_id") in kit.centers else 0.0)
-            if req.urgency in ("critical", "urgent") else
-            float(item.get("expires_sim_min", 0)),
-            float(item.get("expires_sim_min", 0)),
-            (km_between(
-                hospital.lat, hospital.lon,
-                kit.centers[item["center_id"]].lat, kit.centers[item["center_id"]].lon,
-            ) if hospital and item.get("center_id") in kit.centers else 0.0),
-        ))
+        eta_cache: dict[str, float | None] = {}
+
+        def stock_eta(item: dict) -> float | None:
+            center_id = item.get("center_id")
+            if not hospital or center_id not in kit.centers:
+                return None
+            if center_id not in eta_cache:
+                center = kit.centers[center_id]
+                minutes = travel_minutes(
+                    (center.lat, center.lon),
+                    (hospital.lat, hospital.lon),
+                )
+                eta_cache[center_id] = None if minutes is None else 10.0 + minutes
+            return eta_cache[center_id]
+
+        def distance_for(item: dict) -> float:
+            center_id = item.get("center_id")
+            if not hospital or center_id not in kit.centers:
+                return 0.0
+            center = kit.centers[center_id]
+            return km_between(hospital.lat, hospital.lon, center.lat, center.lon)
+
+        if req.urgency in ("critical", "urgent"):
+            sla = float(kit.rules.get("sla", {}).get(req.urgency, 0) or 0)
+            remaining_sla = max(0.0, sla - max(0.0, sim - req.created_sim))
+            # A far unit that cannot arrive before the SLA must not block the
+            # donor wave: skip it and let donors cover the deficit.
+            items = [
+                item for item in items
+                if (eta := stock_eta(item)) is None or eta <= remaining_sla
+            ]
+
+        def sort_key(item: dict) -> tuple:
+            expiry = float(item.get("expires_sim_min", 0))
+            if req.urgency in ("critical", "urgent"):
+                eta = stock_eta(item)
+                return (
+                    0 if eta is not None else 1,
+                    eta if eta is not None else distance_for(item),
+                    expiry,
+                )
+            return (expiry, distance_for(item))
+
+        items.sort(key=sort_key)
+        available = sum(int(item.get("units", 0)) for item in items)
+        dispatch_limit = remaining
+        if req.urgency != "critical":
+            pending_critical = db.scalar(select(func.count()).select_from(Request).where(
+                Request.urgency == "critical",
+                Request.status.in_(("pending_review", "open", "mobilizing")),
+                Request.id != req.id,
+            )) or 0
+            # Non-critical requests always leave one compatible unit for a future
+            # critical request; each already-pending critical request reserves two.
+            reserve = min(available, max(1, pending_critical * 2)) if available else 0
+            dispatch_limit = min(remaining, max(0, available - reserve))
         dispatched = 0
         for item in items:
-            if remaining <= 0:
+            if dispatch_limit <= 0:
                 break
-            units = min(int(item["units"]), remaining)
+            units = min(int(item["units"]), dispatch_limit)
             dispatch_id = new_id("DSP")
             payload = {
                 "dispatch_id": dispatch_id, "request_id": req.id,
@@ -264,6 +310,7 @@ def activate_request(db, request_id: str) -> None:
             ))
             req.allocated_units += units
             remaining -= units
+            dispatch_limit -= units
             dispatched += units
         if dispatched:
             req.status = "mobilizing" if req.allocated_units < req.units else "mobilizing"
@@ -278,8 +325,11 @@ def activate_request(db, request_id: str) -> None:
             return
         remaining = max(0, req.units - req.allocated_units)
         if remaining > 0:
-            multiplier = 3.0 if req.urgency == "critical" else (2.5 if req.urgency == "urgent" else 1.5)
-            wave = int(math.ceil(remaining * multiplier))
+            if req.urgency == "critical":
+                wave = max(6, int(math.ceil(remaining * 3.0)))
+            else:
+                multiplier = 2.5 if req.urgency == "urgent" else 1.5
+                wave = int(math.ceil(remaining * multiplier))
             donor_ids = _pick_donors(db, req, sim, max(1, min(60, wave)))
             sent = 0
             for donor_id in donor_ids:
