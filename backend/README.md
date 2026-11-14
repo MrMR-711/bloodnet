@@ -9,8 +9,11 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+alembic upgrade head
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
+
+اگر دیتابیس قدیمی بدون Alembic ساخته شده است، یک‌بار `alembic stamp head` را اجرا کنید. برنامه در صورت نبود جدول‌ها با پیام واضح متوقف می‌شود و دیگر Schema را خودکار نمی‌سازد.
 
 آدرس‌ها:
 
@@ -58,15 +61,19 @@ python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 - ثبت درخواست با `Idempotency-Key` و پاسخ تکرارپذیر
 - چرخه وضعیت درخواست: `pending_review`، `open`، `mobilizing`، `partially_fulfilled`، `fulfilled`، `cancelled`
 - تخصیص موجودی با FEFO برای درخواست‌های planned و اولویت فاصله برای critical/urgent
-- Dispatch اتمی در سطح سرویس و جلوگیری از تخصیص دوباره با `dispatch_id`
+- Dispatch سریال‌شده در یک Process؛ جلوگیری از تخصیص دوباره و تعارض `dispatch_id`
+- جلوگیری از Overfill در دو اهدا و Dispatch بیش از باقی‌مانده درخواست
 - Callbackهای اهداکننده با `event_id` یکتا و جلوگیری از شمارش دوباره
 - فقط رویداد `donated` مقدار `supplied_units` را افزایش می‌دهد
 - Smart Service قاعده‌محور و Deterministic با خروجی قابل توضیح
-- `X-Request-ID` روی همه پاسخ‌ها و Readiness Probe
+- `X-Request-ID` اعتبارسنجی‌شده روی همه پاسخ‌ها و Readiness Probe
 
 ## محدودیت‌های صادقانه
 
 - قفل‌های `threading.Lock` فقط در یک Process معتبرند؛ برای چند Worker به قفل دیتابیسی/صف نیاز است.
+- قفل Dispatch در یک Process نگه داشته می‌شود و I/O خارجی را هم پوشش می‌دهد؛ Production به تراکنش/رزرو اتمی و Timeout کوتاه‌تر نیاز دارد.
+- اگر دو اهداکننده هم‌زمان در مسیر باشند، ممکن است اهدای فیزیکی دوم هم ثبت شود؛ شمارنده‌های درخواست از سقف عبور نمی‌کنند و دعوت‌های بعدی متوقف می‌شوند.
+- در Smokeهای محلی، امتیاز بسته به Seed و سناریو بین ۵۶ تا ۹۹ متغیر بود؛ Safety/Overfill/Incompatible در اجرای ۱۲ درخواستی صفر ماند، اما Critical SLA همچنان نقطه ضعف است.
 - SQLite برای Demo مناسب است؛ Production به PostgreSQL، Backup و Pooling نیاز دارد.
 - Auth فعلی Demo Token است؛ OAuth2/OIDC، Rate Limit و امضای Callback ندارد.
 - Scheduler انقضای خودکار درخواست پیاده نشده است.

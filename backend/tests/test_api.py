@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -249,3 +251,143 @@ def test_smart_advice(client):
     assert body["request_id"] == rid
     assert "priority_score" in body
     assert "disclaimer" in body
+
+
+def test_dispatch_id_cannot_be_reused_for_another_request(client, monkeypatch):
+    calls = []
+
+    def fake_dispatch(payload):
+        calls.append(payload["dispatch_id"])
+        return 201, {"dispatch_id": payload["dispatch_id"], "units": payload["units"], "eta_sim_min": 12}
+
+    monkeypatch.setattr("app.routers.dispatch_stock", fake_dispatch)
+    first = create(client, key="dispatch-owner-a", units=1).json()["request_id"]
+    second = create(client, key="dispatch-owner-b", units=1).json()["request_id"]
+    payload = {
+        "dispatch_id": "DSP-shared", "request_id": first, "center_id": "MC1",
+        "blood_group": "O+", "product": "red_cells", "units": 1,
+    }
+    assert client.post("/inventory/dispatch", headers={**HOSPITAL, "X-Sim-Time": "20"}, json=payload).status_code == 201
+
+    payload["request_id"] = second
+    conflict = client.post("/inventory/dispatch", headers={**HOSPITAL, "X-Sim-Time": "21"}, json=payload)
+    assert conflict.status_code == 409
+    assert conflict.json()["error"]["code"] == "dispatch_id_conflict"
+    with SessionLocal() as db:
+        assert db.get(Request, second).allocated_units == 0
+    assert calls == ["DSP-shared"]
+
+
+def test_dispatch_cannot_exceed_remaining_units(client, monkeypatch):
+    calls = []
+    monkeypatch.setattr("app.routers.dispatch_stock", lambda payload: (calls.append(payload), (201, {}))[1])
+    rid = create(client, key="dispatch-overfill", units=1).json()["request_id"]
+    payload = {
+        "dispatch_id": "DSP-too-many", "request_id": rid, "center_id": "MC1",
+        "blood_group": "O+", "product": "red_cells", "units": 2,
+    }
+    response = client.post("/inventory/dispatch", headers={**HOSPITAL, "X-Sim-Time": "20"}, json=payload)
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "dispatch_exceeds_remaining"
+    with SessionLocal() as db:
+        assert db.get(Request, rid).allocated_units == 0
+    assert calls == []
+
+
+def test_late_progress_after_donation_does_not_rewind_state(client, monkeypatch):
+    monkeypatch.setattr("app.services.inventory_items", lambda: [])
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+    rid = create(client, key="late-progress", units=2).json()["request_id"]
+    assert client.post(f"/requests/{rid}/approve", headers={**COORDINATOR, "X-Sim-Time": "20"}, json={}).status_code == 200
+    with SessionLocal() as db:
+        donor_id = db.scalar(select(Notification).where(
+            Notification.request_id == rid, Notification.template == "request_wave"
+        )).donor_id
+
+    assert client.post("/callbacks/donor-progress", json={
+        "event_id": "late-donated", "request_id": rid, "donor_id": donor_id,
+        "event": "donated", "sim_time": 30,
+    }).status_code == 200
+    assert client.post("/callbacks/donor-progress", json={
+        "event_id": "late-en-route", "request_id": rid, "donor_id": donor_id,
+        "event": "en_route", "sim_time": 31,
+    }).status_code == 200
+    state = client.get(f"/requests/{rid}", headers=HOSPITAL).json()
+    assert state["en_route"] == 0
+    assert state["supplied_units"] == 1
+    assert state["last_event"] == "donor_donated"
+    assert state["status"] == "partially_fulfilled"
+
+
+def test_donation_after_cancel_is_ignored(client, monkeypatch):
+    monkeypatch.setattr("app.services.inventory_items", lambda: [])
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+    rid = create(client, key="cancel-then-donate", units=2).json()["request_id"]
+    assert client.post(f"/requests/{rid}/approve", headers={**COORDINATOR, "X-Sim-Time": "20"}, json={}).status_code == 200
+    with SessionLocal() as db:
+        donor_id = db.scalar(select(Notification).where(
+            Notification.request_id == rid, Notification.template == "request_wave"
+        )).donor_id
+    assert client.post(f"/requests/{rid}/cancel", headers={**HOSPITAL, "X-Sim-Time": "25"}).status_code == 200
+    assert client.post("/callbacks/donor-progress", json={
+        "event_id": "donated-after-cancel", "request_id": rid, "donor_id": donor_id,
+        "event": "donated", "sim_time": 26,
+    }).status_code == 200
+    state = client.get(f"/requests/{rid}", headers=HOSPITAL).json()
+    assert state["status"] == "cancelled"
+    assert state["supplied_units"] == 0
+    assert state["fulfilled"] == 0
+
+
+def test_two_donations_cannot_overfill_request(client, monkeypatch):
+    monkeypatch.setattr("app.services.inventory_items", lambda: [])
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+    rid = create(client, key="overfill-donors", units=1).json()["request_id"]
+    assert client.post(f"/requests/{rid}/approve", headers={**COORDINATOR, "X-Sim-Time": "20"}, json={}).status_code == 200
+    with SessionLocal() as db:
+        donors = db.scalars(select(Notification).where(
+            Notification.request_id == rid, Notification.template == "request_wave"
+        )).all()
+        assert len(donors) >= 2
+        donor_ids = [row.donor_id for row in donors[:2]]
+
+    for index, donor_id in enumerate(donor_ids):
+        assert client.post("/callbacks/donor-progress", json={
+            "event_id": f"overfill-donated-{index}", "request_id": rid, "donor_id": donor_id,
+            "event": "donated", "sim_time": 30 + index,
+        }).status_code == 200
+    state = client.get(f"/requests/{rid}", headers=HOSPITAL).json()
+    assert state["supplied_units"] == 1
+    assert state["fulfilled"] == 1
+    assert state["status"] == "fulfilled"
+
+
+def test_unhandled_error_keeps_request_id_and_cors(monkeypatch):
+    def explode(_db, _request_id):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr("app.routers.get_request", explode)
+    with TestClient(app, raise_server_exceptions=False) as failing:
+        response = failing.get(
+            "/requests/REQ-boom",
+            headers={**HOSPITAL, "Origin": "http://localhost:5173", "X-Request-ID": "boom-123"},
+        )
+    assert response.status_code == 500
+    assert response.headers["X-Request-ID"] == "boom-123"
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
+
+
+def test_alembic_upgrade_and_check(tmp_path):
+    database = tmp_path / "alembic_test.db"
+    env = {**os.environ, "DATABASE_URL": f"sqlite:///{database.as_posix()}"}
+    backend = Path(__file__).resolve().parents[1]
+    upgrade = subprocess.run(
+        [sys.executable, "-m", "alembic", "upgrade", "head"],
+        cwd=backend, env=env, capture_output=True, text=True,
+    )
+    assert upgrade.returncode == 0, upgrade.stderr
+    check = subprocess.run(
+        [sys.executable, "-m", "alembic", "check"],
+        cwd=backend, env=env, capture_output=True, text=True,
+    )
+    assert check.returncode == 0, check.stdout + check.stderr

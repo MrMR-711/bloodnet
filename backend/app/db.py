@@ -3,10 +3,19 @@ from __future__ import annotations
 from collections.abc import Generator
 from pathlib import Path
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, inspect
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from .config import settings
+
+REQUIRED_TABLES = {
+    "requests",
+    "idempotency_records",
+    "dispatches",
+    "notifications",
+    "donor_events",
+    "audit_events",
+}
 
 if settings.database_url.startswith("sqlite:///"):
     Path(settings.database_url.removeprefix("sqlite:///")).parent.mkdir(parents=True, exist_ok=True)
@@ -38,7 +47,14 @@ def get_db() -> Generator[Session, None, None]:
         session.close()
 
 
-def init_db() -> None:
-    from . import models  # noqa: F401
-
-    Base.metadata.create_all(engine)
+def ensure_schema() -> None:
+    """Fail fast when the database has not been migrated yet."""
+    tables = set(inspect(engine).get_table_names())
+    missing = sorted(REQUIRED_TABLES - tables)
+    if missing:
+        raise RuntimeError(
+            "Database schema is not initialized (missing tables: "
+            + ", ".join(missing)
+            + "). Run `alembic upgrade head` from the backend directory. "
+            "For a legacy database created before Alembic, run `alembic stamp head` once."
+        )

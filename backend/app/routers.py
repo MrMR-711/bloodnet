@@ -168,9 +168,21 @@ def _dispatch_locked(body: DispatchRequest, db: Session, sim: float):
         raise ApiError(422, "incompatible", "blood group is not compatible")
     existing = db.get(Dispatch, body.dispatch_id)
     if existing is not None:
+        same_dispatch = (
+            existing.request_id == body.request_id
+            and existing.units == body.units
+            and existing.center_id == body.center_id
+            and existing.product == body.product
+            and existing.blood_group == body.blood_group
+        )
+        if not same_dispatch:
+            raise ApiError(409, "dispatch_id_conflict", "dispatch_id already belongs to a different dispatch")
         return JSONResponse(status_code=200, content={
             "dispatch_id": existing.id, "units": existing.units, "eta_sim_min": existing.eta_sim_min,
         })
+    remaining = max(0, req.units - req.allocated_units)
+    if body.units > remaining:
+        raise ApiError(409, "dispatch_exceeds_remaining", f"dispatch exceeds remaining units ({remaining})")
     payload = body.model_dump()
     payload.update(hospital_id=req.hospital_id, recipient_blood_group=req.blood_group)
     status, result = dispatch_stock(payload)

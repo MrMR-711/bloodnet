@@ -325,6 +325,11 @@ def handle_donor_response(db, payload, sim: float) -> None:
             req.id, payload.donor_id, [(r.id, r.donor_id, r.template) for r in rows],
         )
         raise ApiError(400, "unknown_notification", "donor was not invited for this request")
+    already_donated = _event_count(db, req.id, payload.donor_id, "donated") > 0
+    if req.status in TERMINAL or already_donated:
+        db.add(DonorEvent(event_id=payload.event_id, request_id=req.id, donor_id=payload.donor_id, event=payload.response, sim_time=sim))
+        db.commit()
+        return
     if notif.response != payload.response:
         notif.response = payload.response
         notif.updated_sim = sim
@@ -361,11 +366,16 @@ def handle_donor_progress(db, payload, sim: float) -> None:
     if notif is None:
         raise ApiError(400, "unknown_notification", "donor was not invited for this request")
     prior = _event_count(db, req.id, payload.donor_id, payload.event)
+    already_donated = _event_count(db, req.id, payload.donor_id, "donated") > 0
     db.add(DonorEvent(event_id=payload.event_id, request_id=req.id, donor_id=payload.donor_id, event=payload.event, sim_time=sim))
+    if req.status in TERMINAL or (already_donated and payload.event != "donated"):
+        db.commit()
+        return
     if prior == 0:
         if payload.event == "en_route":
             req.en_route += 1
-            req.status = "mobilizing"
+            if req.status in ("open", "mobilizing"):
+                req.status = "mobilizing"
             req.last_event = "donor_en_route"
             audit(db, sim, req.id, payload.donor_id, "donor", "donor_progress", "اهداکننده در مسیر مرکز است", "en_route +۱؛ supplied بدون تغییر")
         elif payload.event == "arrived":
@@ -373,6 +383,12 @@ def handle_donor_progress(db, payload, sim: float) -> None:
             req.last_event = "donor_arrived"
             audit(db, sim, req.id, payload.donor_id, "donor", "donor_progress", "اهداکننده به مرکز رسید", "arrived +۱؛ supplied بدون تغییر")
         elif payload.event == "donated":
+            if req.fulfilled >= req.units:
+                db.commit()
+                return
+            if notif.response != "accepted":
+                notif.response = "accepted"
+                req.confirmed += 1
             req.supplied_units += 1
             req.fulfilled = min(req.units, req.fulfilled + 1)
             notif.active = False
