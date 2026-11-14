@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .db import init_db
 from .errors import ApiError, api_error_handler, validation_error_handler
+from .middleware import RequestIDMiddleware
 from .routers import router
 
 
@@ -28,7 +29,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Request-ID"],
 )
+app.add_middleware(RequestIDMiddleware)
 
 app.add_exception_handler(ApiError, api_error_handler)
 app.add_exception_handler(RequestValidationError, validation_error_handler)

@@ -43,6 +43,20 @@ def test_health(client):
     assert response.json() == {"ok": True}
 
 
+def test_readiness_health(client):
+    response = client.get("/health/ready")
+    assert response.status_code == 200
+    assert response.json() == {"ok": True, "database": "ok"}
+
+
+def test_request_id_generated_and_preserved(client):
+    generated = client.get("/health")
+    assert generated.headers.get("X-Request-ID")
+
+    preserved = client.get("/health", headers={"X-Request-ID": "caller-123"})
+    assert preserved.headers.get("X-Request-ID") == "caller-123"
+
+
 def test_create_idempotent_replay(client):
     first = create(client)
     assert first.status_code == 201

@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Response
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from .clients import dispatch_stock, inventory_items
@@ -42,6 +43,15 @@ coordinator_auth = _auth(settings.coordinator_token)
 @router.get("/health")
 def health():
     return {"ok": True}
+
+
+@router.get("/health/ready")
+def readiness(db: DB):
+    try:
+        db.execute(text("SELECT 1"))
+        return {"ok": True, "database": "ok"}
+    except Exception:
+        return JSONResponse(status_code=503, content={"ok": False, "database": "error"})
 
 
 @router.post("/requests")

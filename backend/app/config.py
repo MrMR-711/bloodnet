@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     travel_url: str = "http://127.0.0.1:9200"
     inventory_url: str = "http://127.0.0.1:9300"
     smart_enabled: bool = True
+    request_id_header: str = "X-Request-ID"
 
 
 settings = Settings()
