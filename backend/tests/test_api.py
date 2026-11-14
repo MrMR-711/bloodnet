@@ -1,4 +1,6 @@
 import os
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 os.environ.setdefault("DATABASE_URL", f"sqlite:///{(Path(__file__).resolve().parents[1] / 'data' / 'test_bloodnet.db').as_posix()}")
@@ -10,7 +12,7 @@ from sqlalchemy import select
 
 from app.db import Base, SessionLocal, engine
 from app.main import app
-from app.models import Notification
+from app.models import Dispatch, Notification, Request
 
 HOSPITAL = {"Authorization": "Bearer hospital-token"}
 COORDINATOR = {"Authorization": "Bearer coordinator-token"}
@@ -55,6 +57,47 @@ def test_request_id_generated_and_preserved(client):
 
     preserved = client.get("/health", headers={"X-Request-ID": "caller-123"})
     assert preserved.headers.get("X-Request-ID") == "caller-123"
+
+
+def test_concurrent_dispatch_replay_allocates_once(client, monkeypatch):
+    calls = []
+
+    def fake_dispatch(payload):
+        calls.append(payload["dispatch_id"])
+        time.sleep(0.2)
+        return 201, {
+            "dispatch_id": payload["dispatch_id"],
+            "units": payload["units"],
+            "eta_sim_min": 15,
+        }
+
+    monkeypatch.setattr("app.routers.dispatch_stock", fake_dispatch)
+    rid = create(client, units=1).json()["request_id"]
+    payload = {
+        "dispatch_id": "DSP-concurrent",
+        "request_id": rid,
+        "center_id": "C01",
+        "blood_group": "O+",
+        "product": "red_cells",
+        "units": 1,
+    }
+
+    def call():
+        return client.post(
+            "/inventory/dispatch",
+            headers={**HOSPITAL, "X-Sim-Time": "20"},
+            json=payload,
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = [future.result() for future in [pool.submit(call), pool.submit(call)]]
+
+    assert sorted(result.status_code for result in results) == [200, 201]
+    assert len(calls) == 1
+    with SessionLocal() as db:
+        request = db.get(Request, rid)
+        assert request.allocated_units == 1
+        assert len(db.scalars(select(Dispatch).where(Dispatch.request_id == rid)).all()) == 1
 
 
 def test_create_idempotent_replay(client):
@@ -128,6 +171,45 @@ def test_request_lifecycle_and_callback_dedupe(client, monkeypatch):
     state = client.get(f"/requests/{rid}", headers=HOSPITAL).json()
     assert state["en_route"] <= 1
     assert state["fulfilled"] == 0
+
+
+def test_out_of_order_callbacks_do_not_double_count(client, monkeypatch):
+    monkeypatch.setattr("app.services.inventory_items", lambda: [])
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+
+    rid = create(client, units=2).json()["request_id"]
+    approved = client.post(f"/requests/{rid}/approve", headers={**COORDINATOR, "X-Sim-Time": "20"}, json={})
+    assert approved.status_code == 200
+
+    with SessionLocal() as db:
+        notification = db.scalar(select(Notification).where(
+            Notification.request_id == rid, Notification.template == "request_wave"
+        ))
+        assert notification is not None
+        donor_id = notification.donor_id
+
+    donated = {
+        "event_id": "evt-donated-before-accepted",
+        "request_id": rid,
+        "donor_id": donor_id,
+        "event": "donated",
+        "sim_time": 30,
+    }
+    accepted = {
+        "event_id": "evt-accepted-after-donated",
+        "request_id": rid,
+        "donor_id": donor_id,
+        "response": "accepted",
+        "sim_time": 31,
+    }
+    assert client.post("/callbacks/donor-progress", json=donated).status_code == 200
+    assert client.post("/callbacks/donor-response", json=accepted).status_code == 200
+
+    state = client.get(f"/requests/{rid}", headers=HOSPITAL).json()
+    assert state["supplied_units"] == 1
+    assert state["fulfilled"] == 1
+    assert state["confirmed"] == 1
+    assert state["status"] == "partially_fulfilled"
 
 
 def test_cancel_twice_and_amend(client):

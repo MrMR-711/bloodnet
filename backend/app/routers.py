@@ -18,6 +18,7 @@ from .schemas import (
     DonorResponseCallback, GatewayStatusCallback, NewRequest,
 )
 from .services import (
+    ACTIVATION_LOCK,
     CALLBACK_LOCK,
     amend_request, approve_request, audit, cancel_request, create_request,
     get_request, handle_donor_progress, handle_donor_response,
@@ -153,6 +154,11 @@ def dispatch(
     x_sim_time: Annotated[str | None, Header(alias="X-Sim-Time")] = None,
 ):
     sim = resolve_sim_time(x_sim_time)
+    with ACTIVATION_LOCK:
+        return _dispatch_locked(body, db, sim)
+
+
+def _dispatch_locked(body: DispatchRequest, db: Session, sim: float):
     req = get_request(db, body.request_id)
     if req.status in ("cancelled", "fulfilled", "expired"):
         raise ApiError(409, "invalid_state", f"request is {req.status}")
