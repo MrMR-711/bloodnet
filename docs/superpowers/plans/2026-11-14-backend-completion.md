@@ -14,7 +14,7 @@
 
 - Do not change existing endpoint paths, auth tokens, or response shapes used by `harness/contract_tests.py`.
 - All simulation logic must use simulation time, never wall-clock time.
-- Existing 9 backend tests and 15 contract tests must continue to pass.
+- Existing backend tests (currently 28) and 15 contract tests must continue to pass.
 - Do not claim full multi-worker safety; document the single-process lock limitation.
 - Use UTF-8 for all Persian docs.
 
@@ -41,10 +41,10 @@
 - Consumes: `app.config.settings.database_url`, `app.db.Base.metadata`
 - Produces: `alembic upgrade head` creates all six tables.
 
-- [ ] **Step 1: Create Alembic config and env**
-- [ ] **Step 2: Autogenerate or write the initial migration for all models**
-- [ ] **Step 3: Run `alembic upgrade head` against a temp SQLite DB and verify all tables**
-- [ ] **Step 4: Commit**
+- [x] **Step 1: Create Alembic config and env**
+- [x] **Step 2: Autogenerate or write the initial migration for all models**
+- [x] **Step 3: Run `alembic upgrade head` against a temp SQLite DB and verify all tables**
+- [x] **Step 4: Commit**
 
 ### Task 2: Add request tracing and readiness health
 
@@ -58,11 +58,11 @@
 - Produces: `GET /health/ready` -> `{"ok": true, "database": "ok"}`
 - Produces: every response includes `X-Request-ID`; caller-supplied IDs are preserved.
 
-- [ ] **Step 1: Write failing tests for readiness and request ID**
-- [ ] **Step 2: Run tests and confirm failure**
-- [ ] **Step 3: Implement middleware and readiness endpoint**
-- [ ] **Step 4: Run tests and confirm pass**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Write failing tests for readiness and request ID**
+- [x] **Step 2: Run tests and confirm failure**
+- [x] **Step 3: Implement middleware and readiness endpoint**
+- [x] **Step 4: Run tests and confirm pass**
+- [x] **Step 5: Commit**
 
 ### Task 3: Serialize dispatch and cover idempotency/out-of-order callbacks
 
@@ -75,11 +75,11 @@
 - Consumes: `ACTIVATION_LOCK`, `Dispatch`, `dispatch_stock`
 - Produces: dispatch handler serialized with activation; duplicate dispatch ID returns existing row without a second allocation.
 
-- [ ] **Step 1: Write failing dispatch replay and out-of-order callback tests**
-- [ ] **Step 2: Run tests and confirm failure**
-- [ ] **Step 3: Wrap dispatch in `ACTIVATION_LOCK` and reuse the existing dispatch row**
-- [ ] **Step 4: Run tests and confirm pass**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Write failing dispatch replay and out-of-order callback tests**
+- [x] **Step 2: Run tests and confirm failure**
+- [x] **Step 3: Wrap dispatch in `ACTIVATION_LOCK` and reuse the existing dispatch row**
+- [x] **Step 4: Run tests and confirm pass**
+- [x] **Step 5: Commit**
 
 ### Task 4: Fix Smart Service SLA pressure to use current simulation time
 
@@ -92,11 +92,11 @@
 - Produces: `smart_advice(db, request_id, sim: float | None = None)`; when `sim` is omitted, uses `gateway_clock()`.
 - Produces: `GET /smart/requests/{id}` accepts optional `X-Sim-Time`.
 
-- [ ] **Step 1: Write failing test: advice at sim 100 has more SLA pressure than at sim 10**
-- [ ] **Step 2: Run test and confirm failure**
-- [ ] **Step 3: Implement current-sim elapsed calculation**
-- [ ] **Step 4: Run test and confirm pass**
-- [ ] **Step 5: Commit**
+- [x] **Step 1: Write failing test: advice at sim 100 has more SLA pressure than at sim 10**
+- [x] **Step 2: Run test and confirm failure**
+- [x] **Step 3: Implement current-sim elapsed calculation**
+- [x] **Step 4: Run test and confirm pass**
+- [x] **Step 5: Commit**
 
 ### Task 5: Final verification and documentation
 
@@ -105,8 +105,34 @@
 - Modify: `README.md` (if backend status is stale)
 - Test: full backend suite, contract tests, smoke run
 
-- [ ] **Step 1: Rewrite backend README in clean UTF-8 Persian with run/migrate/test commands**
-- [ ] **Step 2: Run `pytest` and confirm all tests pass**
-- [ ] **Step 3: Start backend and run `python -m harness.contract_tests --team http://127.0.0.1:8000`**
-- [ ] **Step 4: Run one practice smoke scenario and record the score**
+- [x] **Step 1: Rewrite backend README in clean UTF-8 Persian with run/migrate/test commands**
+- [x] **Step 2: Run `pytest` and confirm all tests pass**
+- [x] **Step 3: Start backend and run `python -m harness.contract_tests --team http://127.0.0.1:8000`**
+- [x] **Step 4: Run one practice smoke scenario and record the score**
 - [ ] **Step 5: Commit and push `main`; fast-forward `backend` branch if it exists**
+  - Commit/Push نهایی مستندات پس از همین فایل انجام می‌شود.
+  - `backend` در `f324684` است و fast-forward نشده؛ `main` مرجع تحویل است.
+
+---
+
+## Final Verification — 2026-11-14
+
+| بررسی | نتیجه |
+|---|---|
+| `backend\.venv\Scripts\python.exe -m pytest tests -q` | `28 passed, 32 warnings in 8.55s` |
+| Contract روی `127.0.0.1:8001` با DB تازه | `15/15 passed` |
+| `npm run typecheck` / `npm run build` | موفق؛ فقط هشدار Chunk بزرگ‌تر از ۵۰۰kB |
+| `python tests/validate_public_kit.py` | `PASS` — `donors=20000 hospitals=14 centers=5 requests=8152 responses=207486` |
+
+Smokeهای ثبت‌شده با کد نهایی Backend: Seed `4000` امتیازهای `95.7` و
+`98.8` با `Critical SLA=1.0`؛ Seed `4001` امتیاز `70.5` با
+`Critical SLA=0.333` به‌دلیل یک درخواست Critical پلاکت O+ که از نظر فیزیکی
+در SLA ۹۰ دقیقه‌ای قابل تحقق نبود. تلاش برای اجرای Smoke تازه در همین
+به‌روزرسانی مستندات به Timeout خورد و نتیجهٔ جدیدی تولید نکرد؛ بنابراین
+فقط شواهد تاریخی ثبت می‌شوند، نه یک Smoke تازه.
+
+شکاف‌های باقی‌مانده (Expiry، قفل چند‌Processی، تعهد اتمی اهداکننده،
+کنترل تعلیق نزدیک ارسال، Audit/Retry کامل، `defer_until` صریح، Throughput و
+Clone تازه، SQLite/Auth دمو و Endpointهای خارج از قرارداد) در
+`docs/backend-final-status.md` ثبت شده‌اند. این Plan تکمیل «هسته/Demo» را
+ثبت می‌کند، نه Production کامل را.

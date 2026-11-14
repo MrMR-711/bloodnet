@@ -105,19 +105,34 @@ Endpointهای مورد استفاده: `/health`، `/requests`، `/requests/{id
 - حداقل هدف لمسی 44 پیکسل، کنتراست متن و احترام به `prefers-reduced-motion`
 - جدول‌ها در موبایل به کارت تبدیل می‌شوند و شناسه‌های فنی LTR نمایش داده می‌شوند
 
-## تصمیم‌های Backend (مستند، بدون پیاده‌سازی)
+## پیاده‌سازی Backend
 
 Python `3.14.7`، FastAPI `0.162.5`، Uvicorn `0.54.0`، SQLAlchemy `2.1.8`، SQLite با WAL و
 `foreign_keys`، Alembic `1.20.1`، Pydantic `2.14.3`، httpx `0.28.1` و pytest `9.2.0`. سرویس محصول روی
 پورت `8000` و Mockها روی `9100`/`9200`/`9300` اجرا می‌شوند. SQLite برای دموی محلی انتخاب شده و مسیر مهاجرت
-به PostgreSQL باید مستند شود. جزئیات در `../docs/technology-decisions.md`.
+به PostgreSQL باید مستند شود. جزئیات در `../docs/technology-decisions.md` و وضعیت نهایی در
+`../docs/backend-final-status.md`.
 
 Smart Service به‌صورت یک ماژول مشورتی قطعی و قابل توضیح بر پایه قواعد، بدون LLM و بدون تصمیم پزشکی پیاده‌سازی
-شده است. خروجی آن توصیه عملیاتی است و جای ارزیابی بالینی را نمی‌گیرد.
+شده است. خروجی آن توصیه عملیاتی است و جای ارزیابی بالینی را نمی‌گیرد. جزئیات در `../DECLARED.md`.
+
+## وضعیت آزمون
+
+| بررسی | نتیجه |
+|---|---|
+| `npm run typecheck` | موفق |
+| `npm run build` | موفق؛ فقط هشدار Chunk بزرگ‌تر از ۵۰۰kB |
+| `backend` — `pytest -q` | `28 passed` |
+| Contract — نمونهٔ ایزولهٔ `8001` | `15/15 passed` |
+
+این اعداد شاهد اجرای تازه‌اند. Smokeهای ثبت‌شده به Seed و سناریو وابسته‌اند و
+امتیاز رسمی داوری نیستند.
 
 ## مستندات
 
+- `../docs/backend-final-status.md`
 - `../docs/technology-decisions.md`
 - `../docs/git-workflow.md`
+- `../DECLARED.md`
 - `../participant_kit/openapi.yaml`
 - `../participant_kit/compat.yaml`

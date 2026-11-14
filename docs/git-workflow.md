@@ -11,8 +11,11 @@
 | `frontend` | توسعه Frontend | `Reza-zahedi` | `Reza-zahedi` | `zahdireza6327@gmail.com` |
 
 - هر دو Branch کاری در همین Repository مشترک هستند؛ دو مخزن جدا ساخته نمی‌شود.
-- توسعه مستقیم روزمره روی `main` ممنوع است.
-- هر سه Branch در وضعیت فعلی به Commit اولیه مشترک اشاره می‌کنند.
+- توسعه مستقیم روزمره روی `main` ممنوع است؛ ادغام نهایی و Commitهای مستندات
+  با هماهنگی روی `main` انجام می‌شوند.
+- `main` شاخهٔ مرجع فعلی است. `backend` در `f324684` و `frontend` در
+  `04814c7` قرار دارند؛ `backend` از Remote خود ۱۲ Commit جلوتر است و
+  `frontend` با Remote هم‌سطح است. جزئیات در بخش ۶.
 
 ## ۲. هویت Commit در برابر احراز هویت Push
 
@@ -107,13 +110,22 @@ Private Key هرگز داخل مخزن یا Workspace ذخیره نمی‌شود
 
 ## ۶. وضعیت فعلی
 
+**ثبت‌شده پیش از Commit نهایی مستندات؛ Commit جدید در گزارش پایانی اعلام می‌شود.**
+
 | مورد | وضعیت |
 |---|---|
 | Local Repository | `INITIALIZED` |
 | Initial Commit | `d7d307d` — `CREATED AND PUSHED` |
+| `main` / `origin/main` | `93e97d5` — هم‌سطح |
+| Branch `backend` | `f324684` — ۱۲ Commit جلوتر از `origin-backend/backend` |
+| Branch `frontend` | `04814c7` — هم‌سطح `origin-frontend/frontend` |
+| شاخهٔ مرجع | `main` — شامل Backend و Frontend |
 | Remoteها | `origin` / `origin-backend` / `origin-frontend` — `CONFIGURED` |
-| Branchهای کاری | `backend` و `frontend` — `CREATED AND PUSHED` |
 | Auth Owner (`MrMR-711`) | `VERIFIED` |
 | Auth Teammate (`reza-zahedi6327`) | `VERIFIED` |
 | Collaboration Invite | `ACCEPTED — WRITE` |
-| Push `main` / `backend` / `frontend` | `VERIFIED` |
+| Push `main` / `frontend` | `VERIFIED` |
+| Push `backend` | آخرین Push قدیمی‌تر از `f324684` است؛ `origin-backend` عقب است |
+
+Branchهای `backend` و `frontend` تاریخی‌اند و برای تحویل، `main` مرجع است.
+هیچ Force Push یا History Rewrite انجام نشده است.

@@ -1,7 +1,7 @@
 # وضعیت Bootstrap محیط — BloodNet
 
-**تاریخ:** 2026-11-12
-**وضعیت کلی:** `ENVIRONMENT READY — IMPLEMENTATION NOT STARTED`
+**تاریخ:** 2026-11-14
+**وضعیت کلی:** `ENVIRONMENT READY — CORE/DEMO IMPLEMENTED — PRODUCTION GAPS REMAIN`
 
 ## ۱. مسیرهای واقعی
 
@@ -42,17 +42,19 @@
 
 | مورد | وضعیت |
 |---|---|
-| `git init` | انجام شده با Branch اولیه `main` |
-| Commit اولیه | `d7d307dd808fbc898b8104b4de4ea29c8c77ad6a` |
-| Author Commit اولیه | `MrMR-711 <mohammad117811@gmail.com>` |
+| Branch پیش‌فرض | `main` |
+| Commit جاری `main` | `93e97d5` — `fix(frontend): مقاوم‌سازی اتصال زنده در قطع سرویس‌های جانبی` |
+| `origin/main` | هم‌سطح `93e97d5` |
+| Branch `backend` | `f324684` — ۱۲ Commit جلوتر از `origin-backend/backend` |
+| Branch `frontend` | `04814c7` — هم‌سطح `origin-frontend/frontend` |
 | Remoteها | `origin`، `origin-backend`، `origin-frontend` به URL یکسان |
-| Branchها | `main`، `backend`، `frontend` |
-| Push `main` | موفق |
-| Push `backend` | موفق با حساب `MrMR-711` |
-| Push `frontend` | موفق با حساب `reza-zahedi6327` |
+| Remote URL | `https://github.com/MrMR-711/bloodnet.git` |
 | Collaborator | `reza-zahedi6327` با دسترسی `write`؛ دعوت پذیرفته شده |
-| دعوت Pending | صفر |
+| وضعیت Working Tree | تمیز (پیش از به‌روزرسانی مستندات) |
 | Default Branch | `main` |
+
+`main` شاخهٔ ادغام و مرجع فعلی است. Branchهای `backend` و `frontend` تاریخی‌اند
+و ممکن است از `main` عقب باشند؛ جزئیات در `docs/git-workflow.md`.
 
 ## ۵. منابع کپی‌شده
 
@@ -68,25 +70,44 @@
 
 | بررسی | نتیجه |
 |---|---|
-| `python tests/validate_public_kit.py` | `PASS` — donors=20000 hospitals=14 centers=5 requests=8152 responses=207486 |
-| `python -m py_compile harness/*.py` | `PASS` (`rc=0`) |
+| `python tests/validate_public_kit.py` | `PASS` — `donors=20000 hospitals=14 centers=5 requests=8152 responses=207486` |
+| `backend\.venv\Scripts\python.exe -m pytest tests -q` | `28 passed, 32 warnings in 8.55s` |
+| Contract روی `127.0.0.1:8001` با DB تازه | `15/15 passed` |
+| `npm run typecheck` / `npm run build` | موفق؛ فقط هشدار Chunk بزرگ‌تر از ۵۰۰kB |
 | مقایسه SHA-256 فایل‌های کیت | `0 mismatches` |
 | نبود Secret Pattern | `NO_SECRET_PATTERNS` |
 | نبود `.git` تودرتو | فقط `.git` ریشه مخزن |
 
-## ۷. موانع باقی‌مانده
+## ۷. Runtime محلی
 
-1. پیاده‌سازی محصول هنوز شروع نشده است؛ Backend، Frontend، API، DB،
-   Migration و UI وجود ندارند.
-2. تصمیم‌های فناوری Backend/Database/Build/Version همچنان `NOT DECIDED` هستند.
-3. Commit اولیه مشترک هر سه Branch توسط `MrMR-711` ثبت شده است؛ Commitهای
-   بعدی `frontend` باید با هویت `Reza-zahedi` و Override مشخص انجام شوند.
-4. Smart Service و معماری Backend نیازمند تأیید نهایی تیم هستند.
+| سرویس | آدرس | وضعیت |
+|---|---|---|
+| Frontend | `http://localhost:5173` | فعال |
+| Backend | `http://127.0.0.1:8000` | فعال |
+| Gateway Mock | `http://127.0.0.1:9100` | فعال |
+| Travel Mock | `http://127.0.0.1:9200` | فعال |
+| Inventory Service | `http://127.0.0.1:9300` | فعال |
 
-## ۸. گام بعدی
+بررسی Proxy زنده: `health=True requests=4 hospitals=14 centers=5 inventory=31`.
 
-- شروع پیاده‌سازی فقط با دستور صریح تیم.
-- استفاده از Branch `backend` با هویت `MrMR-711` و Branch `frontend` با
-  هویت `Reza-zahedi`.
-- اجرای چرخه اجباری Commit + Push برای هر تغییر.
-- تکمیل Explainability Gate پیش از هر تغییر محصولی.
+## ۸. موانع باقی‌مانده
+
+1. Scheduler انقضای خودکار درخواست پیاده نشده است؛ `expired` فقط State پایانی است.
+2. قفل‌های Process-level برای چند Worker کافی نیستند؛ قفل دیتابیسی/توزیع‌شده لازم است.
+3. تعهد/آزادسازی اهداکننده در چند Process اتمی نیست.
+4. `donor_eligible` نزدیک ارسال واقعی دوباره بررسی و Audit نمی‌شود.
+5. Audit همهٔ Retryها، ارسال‌های ناموفق و عدم ارسال‌ها را پوشش نمی‌دهد.
+6. `defer_until` به‌صورت فیلد صریح ذخیره نمی‌شود؛ از آخرین Event و قواعد مشتق می‌شود.
+7. آزمون Throughput عددی و راه‌اندازی تأییدشده از Clone تازه انجام نشده است.
+8. SQLite و Auth دمو برای Production کافی نیستند؛ PostgreSQL و Auth واقعی لازم است.
+9. Endpointهای خواندنی محصول (`/requests`، `/catalog`، `/audit`، `/donors` و
+   `/smart/*`) خارج از OpenAPI رسمی‌اند و باید به‌عنوان Extension اعلام شوند.
+
+جزئیات و نقشهٔ FR/NFR/AC در `docs/backend-final-status.md` است.
+
+## ۹. گام بعدی
+
+- Commit و Push همین به‌روزرسانی مستندات روی `main`.
+- در صورت نیاز، هم‌سطح‌سازی Branch تاریخی `backend` با `main`.
+- شروع hardening تولیدی فقط با اولویت‌بندی صریح: Expiry، قفل توزیع‌شده،
+  تعهد اتمی اهداکننده، Audit/Retry و `defer_until`.

@@ -1,14 +1,15 @@
 # تصمیم‌های فنی Backend و Frontend
 
-**وضعیت:** `DECIDED — BACKEND NOT IMPLEMENTED YET`
-**تاریخ:** 2026-11-12
+**وضعیت:** `DECIDED — IMPLEMENTED (CORE/DEMO COMPLETE)`
+**تاریخ:** 2026-11-14
 **مبنای تصمیم:** الزامات رسمی `participant_kit/openapi.yaml`، `SERVICES.md`،
 `DATA_CARD.md`، سندهای `bloodnet-planning/02-requirements/` و
 `bloodnet-planning/03-architecture/`، و محدودیت اجرای محلی چالش.
 
-این سند انتخاب‌های قطعی فنی را ثبت می‌کند. Frontend در ادامه همین شاخه
-پیاده‌سازی می‌شود؛ Backend فقط انتخاب و مستند شده و تا درخواست بعدی
-پیاده‌سازی نمی‌شود.
+این سند انتخاب‌های قطعی فنی را ثبت می‌کند. Frontend و Backend هر دو در همین
+شاخه پیاده‌سازی شده‌اند. وضعیت واقعی، شواهد آزمون و شکاف‌های باقی‌مانده در
+`docs/backend-final-status.md` ثبت شده است؛ این سند فقط انتخاب‌ها و قواعد
+فنی را نگه می‌دارد.
 
 ## 1. Frontend
 
@@ -48,13 +49,16 @@
 - Tailwind 4 از طریق `@tailwindcss/vite` و ایمپورت `tailwindcss`.
 - Dev server روی `5173`؛ Proxy مسیر `/api` به `http://localhost:8000`
   با حذف پیشوند `/api`.
-- `VITE_DEMO_MODE=true` به‌صورت پیش‌فرض؛ `VITE_API_BASE_URL=/api`.
-- در حالت Demo، State در `localStorage` با کلید `bloodnet-demo-v1` نگه داشته
-  می‌شود و کاملاً برچسب `DEMO` دارد.
-- در حالت Live، Adapter قراردادمحور فقط Endpointهای رسمی را صدا می‌زند.
-  لیست همه درخواست‌ها در OpenAPI رسمی وجود ندارد؛ بنابراین Live List تا
-  ارائه Endpoint داخلی/محصولی، به Demo data محدود می‌ماند و Endpoint جدید
-  از خود ساخته نمی‌شود.
+- `VITE_API_BASE=/api` به‌صورت پیش‌فرض؛ حالت Live پیش‌فرض است و توکن‌ها با
+  `VITE_HOSPITAL_TOKEN` / `VITE_COORDINATOR_TOKEN` تنظیم می‌شوند.
+- در حالت Demo/Fallback، State در `localStorage` با کلید `bloodnet-demo-v1`
+  نگه داشته می‌شود و کاملاً برچسب `DEMO` دارد.
+- در حالت Live، Adapter قراردادمحور Endpointهای رسمی را صدا می‌زند. برای
+  نیازهای خواندنی UI، Endpointهای محصولی `/requests` (List)،
+  `/requests/{id}/detail`، `/catalog`، `/audit` و `/donors` اضافه شده‌اند؛
+  این‌ها Extensionهای خواندنی خارج از OpenAPI رسمی‌اند و Endpointهای قرارداد
+  را تغییر نمی‌دهند. Smart Service نیز طبق `DECLARED.md` دو Endpoint
+  مشورتی `/smart/priorities` و `/smart/requests/{id}` دارد.
 
 ## 2. Backend
 
@@ -100,17 +104,23 @@
 - Audit Trail برای همه تغییرهای State و Dispatch الزامی است.
 - Retry محدود برای `429`/`503` با احترام به `Retry-After`.
 
-### محدودیت شناخته‌شده
+### وضعیت پیاده‌سازی و محدودیت‌ها
 
-SQLite برای Demo محلی انتخاب شده است. در بار زیاد یا چند Writer واقعی،
-PostgreSQL مسیر تولیدی است. این محدودیت در README و راهنمای اجرا ذکر می‌شود.
+- Backend با `28` تست واحد و `15/15` تست قرارداد تأیید شده است.
+- قفل‌های Process-level، نبود Scheduler انقضای خودکار، تعهد اتمی اهداکننده،
+  کنترل تعلیق نزدیک ارسال، پوشش کامل Audit/Retry و `defer_until` صریح از
+  شکاف‌های باقی‌مانده‌اند. جزئیات در `docs/backend-final-status.md`.
+- SQLite برای Demo محلی انتخاب شده است. در بار زیاد یا چند Writer واقعی،
+  PostgreSQL مسیر تولیدی است. این محدودیت در README و راهنمای اجرا ذکر می‌شود.
 
 ## 3. Smart Service
 
-تصمیم: یک ماژول اختیاری و **قاعده‌محور** برای توضیح اولویت/صلاحیت
-پیشنهاد می‌شود؛ بدون LLM، بدون تصمیم پزشکی و پشت Feature Flag. خروجی آن
-فقط Advisory است و هیچ State یا موجودی را تغییر نمی‌دهد. در این مرحله
-پیاده‌سازی نمی‌شود و `DECLARED.md` فقط در صورت تحویل واقعی ساخته خواهد شد.
+Smart Service به‌صورت یک ماژول اختیاری و **قاعده‌محور** پیاده‌سازی شده است؛
+بدون LLM، بدون تصمیم پزشکی و پشت Feature Flag `SMART_ENABLED`. خروجی آن
+فقط Advisory است و هیچ State یا موجودی را تغییر نمی‌دهد. Endpointهای
+`GET /smart/priorities` و `GET /smart/requests/{id}` در `DECLARED.md`
+اعلام شده‌اند. این Endpointها Extension مشورتی خارج از OpenAPI رسمی‌اند و
+Endpointهای قرارداد را تغییر نمی‌دهند.
 
 ## 4. مرزهای ثابت
 

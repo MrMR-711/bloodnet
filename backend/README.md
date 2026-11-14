@@ -1,6 +1,6 @@
 # BloodNet Backend
 
-**وضعیت:** هسته Backend پیاده‌سازی و تست شده است. این نسخه برای Demo و داوری آماده است، نه Production کامل.
+**وضعیت:** `CORE/DEMO COMPLETE — PRODUCTION HARDENING GAPS REMAIN` — هسته Backend پیاده‌سازی و با `28` تست Backend و `15/15` تست قرارداد تأیید شده است. این نسخه برای Demo و داوری آماده است، نه Production کامل.
 
 ## اجرا
 
@@ -48,6 +48,20 @@ Smoke نمونه:
 python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 ```
 
+### شواهد آخرین اجرا
+
+| بررسی | نتیجه |
+|---|---|
+| `backend\.venv\Scripts\python.exe -m pytest tests -q` | `28 passed, 32 warnings in 8.55s` |
+| Contract روی نمونهٔ ایزولهٔ `127.0.0.1:8001` با DB تازه | `15/15 passed` |
+| `npm run typecheck` / `npm run build` (Frontend) | موفق؛ فقط هشدار Chunk بزرگ‌تر از ۵۰۰kB |
+| `python tests/validate_public_kit.py` | `PASS` — `donors=20000 hospitals=14 centers=5 requests=8152 responses=207486` |
+
+Smokeهای ثبت‌شده با کد نهایی: Seed `4000` امتیازهای `95.7` و `98.8` با
+`Critical SLA=1.0`؛ Seed `4001` امتیاز `70.5` با `Critical SLA=0.333` به
+دلیل یک درخواست Critical پلاکت O+ که از نظر فیزیکی در SLA ۹۰ دقیقه‌ای قابل
+تحقق نبود. این اعداد شاهد تاریخی‌اند، نه اجرای تازه یا امتیاز رسمی داوری.
+
 ## معماری
 
 - FastAPI + Pydantic برای API و اعتبارسنجی
@@ -59,7 +73,7 @@ python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 ## قابلیت‌ها
 
 - ثبت درخواست با `Idempotency-Key` و پاسخ تکرارپذیر
-- چرخه وضعیت درخواست: `pending_review`، `open`، `mobilizing`، `partially_fulfilled`، `fulfilled`، `cancelled`
+- چرخه وضعیت درخواست: `pending_review`، `open`، `mobilizing`، `partially_fulfilled`، `fulfilled`، `cancelled`؛ `expired` فقط به‌عنوان State پایانی در Guardها وجود دارد و Transition خودکار ندارد
 - تخصیص موجودی با FEFO برای درخواست‌های planned و اولویت ETA/فاصله برای critical/urgent
 - رزرو حداقل یک واحد موجودی برای درخواست بحرانی آینده و دو واحد برای هر درخواست بحرانی در انتظار
 - رد واحدهای موجودی دوردستی که ETA آن‌ها از SLA باقی‌مانده بیشتر است
@@ -81,12 +95,19 @@ python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 - در Seed 4001، درخواست Critical پلاکت O+ به‌دلیل نبود موجودی سازگار و زمان ۹۰ دقیقه‌ای Apheresis در SLA 90 دقیقه‌ای قابل تحقق نبود؛ محدودیت داده و فرایند است، نه کندی Query یا Dispatch.
 - SQLite برای Demo مناسب است؛ Production به PostgreSQL، Backup و Pooling نیاز دارد.
 - Auth فعلی Demo Token است؛ OAuth2/OIDC، Rate Limit و امضای Callback ندارد.
-- Scheduler انقضای خودکار درخواست پیاده نشده است.
+- Scheduler انقضای خودکار درخواست پیاده نشده است؛ `expired` فقط State پایانی است.
+- `donor_eligible` در زمان انتخاب اهداکننده بررسی می‌شود، اما `_send_template` بلافاصله پیش از ارسال واقعی آن را دوباره کنترل نمی‌کند و عدم ارسال را Audit نمی‌کند.
+- Audit رویدادهای کلیدی و بسیاری از Callbackها را پوشش می‌دهد، اما همهٔ Retryهای `429/503`، ارسال‌های ناموفق و عدم ارسال‌ها را ثبت نمی‌کند.
+- تعهد/آزادسازی اهداکننده در یک Process مدیریت می‌شود و برای چند Worker تراکنش اتمی ندارد.
+- فیلد ذخیره‌شدهٔ صریح `defer_until` وجود ندارد؛ تعلیق از آخرین Event و `rules.yaml` مشتق می‌شود.
+- آزمون Throughput عددی و راه‌اندازی تأییدشده از Clone تازه انجام نشده است.
 - Observability کامل (Metrics/Tracing/Alerting) باقی مانده است.
 - Frontend در حالت پیش‌فرض به API وصل است و در نبود آن به داده Demo برمی‌گردد؛ نام نمایشی اهداکنندگان از شناسه ساخته می‌شود.
 
 ## منابع
 
 - قرارداد: `../participant_kit/openapi.yaml`
+- وضعیت نهایی و شکاف‌ها: `../docs/backend-final-status.md`
 - تصمیم‌های فنی: `../docs/technology-decisions.md`
+- Smart Service: `../DECLARED.md`
 - Harness: `../harness`
