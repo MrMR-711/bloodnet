@@ -195,14 +195,25 @@ def _dispatch_locked(body: DispatchRequest, db: Session, sim: float):
 
 
 @router.get("/smart/priorities")
-def priorities(db: DB, _: Annotated[None, Depends(hospital_auth)]):
+def priorities(
+    db: DB,
+    _: Annotated[None, Depends(hospital_auth)],
+    x_sim_time: Annotated[str | None, Header(alias="X-Sim-Time")] = None,
+):
     if not settings.smart_enabled:
         raise ApiError(404, "smart_disabled", "Smart Service is disabled")
-    return {"items": smart_priorities(db)}
+    sim = resolve_sim_time(x_sim_time) if x_sim_time else None
+    return {"items": smart_priorities(db, sim)}
 
 
 @router.get("/smart/requests/{request_id}")
-def advice(request_id: str, db: DB, _: Annotated[None, Depends(hospital_auth)]):
+def advice(
+    request_id: str,
+    db: DB,
+    _: Annotated[None, Depends(hospital_auth)],
+    x_sim_time: Annotated[str | None, Header(alias="X-Sim-Time")] = None,
+):
     if not settings.smart_enabled:
         raise ApiError(404, "smart_disabled", "Smart Service is disabled")
-    return smart_advice(db, request_id)
+    sim = resolve_sim_time(x_sim_time) if x_sim_time else None
+    return smart_advice(db, request_id, sim)

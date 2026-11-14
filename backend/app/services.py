@@ -447,10 +447,11 @@ def request_detail(db, request_id: str) -> dict:
     }
 
 
-def smart_advice(db, request_id: str) -> dict:
+def smart_advice(db, request_id: str, sim: float | None = None) -> dict:
     req = get_request(db, request_id)
     sla = load_kit().rules["sla"].get(req.urgency, 240)
-    elapsed = max(0.0, (req.updated_sim or req.created_sim) - req.created_sim)
+    now = sim if sim is not None else gateway_clock()
+    elapsed = max(0.0, now - req.created_sim)
     deficit = max(0, req.units - req.fulfilled)
     urgency_weight = {"critical": 100, "urgent": 60, "planned": 25}[req.urgency]
     sla_pressure = min(100, (elapsed / max(sla, 1)) * 100)
@@ -478,9 +479,10 @@ def smart_advice(db, request_id: str) -> dict:
     }
 
 
-def smart_priorities(db) -> list[dict]:
+def smart_priorities(db, sim: float | None = None) -> list[dict]:
     rows = db.scalars(select(Request).where(Request.status.notin_(list(TERMINAL)))).all()
-    result = [smart_advice(db, row.id) for row in rows]
+    now = sim if sim is not None else gateway_clock()
+    result = [smart_advice(db, row.id, now) for row in rows]
     return sorted(result, key=lambda item: item["priority_score"], reverse=True)
 
 

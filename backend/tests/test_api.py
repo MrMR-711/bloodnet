@@ -31,11 +31,11 @@ def client():
         yield value
 
 
-def create(client, key="key-1", units=2, hospital="H01", group="O+", product="red_cells"):
+def create(client, key="key-1", units=2, hospital="H01", group="O+", product="red_cells", urgency="critical", sim="10"):
     return client.post(
         "/requests",
-        headers={**HOSPITAL, "Idempotency-Key": key, "X-Sim-Time": "10"},
-        json={"hospital_id": hospital, "blood_group": group, "product": product, "units": units, "urgency": "critical"},
+        headers={**HOSPITAL, "Idempotency-Key": key, "X-Sim-Time": sim},
+        json={"hospital_id": hospital, "blood_group": group, "product": product, "units": units, "urgency": urgency},
     )
 
 
@@ -224,6 +224,20 @@ def test_unknown_request_and_auth(client):
     assert client.get("/requests/REQ-unknown", headers=HOSPITAL).status_code == 404
     assert client.get("/requests/REQ-unknown").status_code == 401
     assert client.post("/requests/REQ-unknown/approve", headers=COORDINATOR, json={}).status_code == 404
+
+
+def test_smart_advice_uses_current_simulation_time(client):
+    rid = create(client, urgency="urgent").json()["request_id"]
+    early = client.get(f"/smart/requests/{rid}", headers={**HOSPITAL, "X-Sim-Time": "10"})
+    late = client.get(f"/smart/requests/{rid}", headers={**HOSPITAL, "X-Sim-Time": "100"})
+    assert early.status_code == 200 and late.status_code == 200
+    early_body, late_body = early.json(), late.json()
+    assert late_body["elapsed_minutes"] == 90
+    assert late_body["sla_minutes"] == 240
+    early_pressure = next(f["value"] for f in early_body["factors"] if f["name"] == "sla_pressure")
+    late_pressure = next(f["value"] for f in late_body["factors"] if f["name"] == "sla_pressure")
+    assert late_pressure > early_pressure
+    assert late_body["priority_score"] > early_body["priority_score"]
 
 
 def test_smart_advice(client):
