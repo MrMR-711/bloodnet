@@ -35,10 +35,8 @@ import { InlineMessage } from '../components/StateViews';
 import {
   compatibleInventoryFor,
   compatibleUnitsFor,
-  DemoError,
   useDemoStore,
 } from '../data/DemoStoreContext';
-import { HOSPITALS } from '../data/seed';
 import {
   expiryLabel,
   formatNumber,
@@ -70,7 +68,7 @@ interface FormValues {
 }
 
 export function NewRequestPage() {
-  const { state, createRequest } = useDemoStore();
+  const { state, createRequest, hospitals } = useDemoStore();
   const navigate = useNavigate();
   const [idempotencyKey, setIdempotencyKey] = useState(() => createIdempotencyKey());
 
@@ -102,14 +100,14 @@ export function NewRequestPage() {
     blood_group: form.values.blood_group,
   });
   const nearestItem = compatibleItems[0];
-  const selectedHospital = HOSPITALS.find((hospital) => hospital.id === form.values.hospital_id);
+  const selectedHospital = hospitals.find((hospital) => hospital.id === form.values.hospital_id);
 
-  const handleSubmit = form.onSubmit((values) => {
-    const hospital = HOSPITALS.find((entry) => entry.id === values.hospital_id);
+  const handleSubmit = form.onSubmit(async (values) => {
+    const hospital = hospitals.find((entry) => entry.id === values.hospital_id);
     if (!hospital) return;
 
     try {
-      const request = createRequest({
+      const request = await createRequest({
         ...values,
         hospital_name: hospital.name,
         note: values.note.trim(),
@@ -124,7 +122,7 @@ export function NewRequestPage() {
     } catch (error) {
       notifications.show({
         title: 'ثبت درخواست انجام نشد',
-        message: error instanceof DemoError ? error.message : 'خطای نامشخص در حالت نمایشی رخ داد.',
+        message: error instanceof Error ? error.message : 'خطای نامشخص در ثبت درخواست رخ داد.',
         color: 'red',
       });
     }
@@ -155,9 +153,9 @@ export function NewRequestPage() {
                   <Select
                     label="بیمارستان درخواست‌دهنده"
                     placeholder="یک بیمارستان انتخاب کنید"
-                    data={HOSPITALS.map((hospital) => ({
+                    data={hospitals.map((hospital) => ({
                       value: hospital.id,
-                      label: `${hospital.name} — ${hospital.city}`,
+                      label: hospital.city ? `${hospital.name} — ${hospital.city}` : hospital.name,
                     }))}
                     searchable
                     allowDeselect={false}
@@ -324,7 +322,8 @@ export function NewRequestPage() {
 
                 {selectedHospital && (
                   <Text size="xs" c="dimmed" lh={1.7}>
-                    بیمارستان انتخاب‌شده: {selectedHospital.name} — {selectedHospital.city}
+                    بیمارستان انتخاب‌شده: {selectedHospital.name}
+                    {selectedHospital.city ? ` — ${selectedHospital.city}` : ''}
                   </Text>
                 )}
               </Stack>

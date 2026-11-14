@@ -43,7 +43,6 @@ import {
 } from '../components/Badges';
 import { EmptyState, InlineMessage } from '../components/StateViews';
 import {
-  DemoError,
   remainingUnits,
   useDemoStore,
 } from '../data/DemoStoreContext';
@@ -91,15 +90,15 @@ export function DonorPage() {
   const notifyError = (error: unknown) => {
     notifications.show({
       title: 'عملیات انجام نشد',
-      message: error instanceof DemoError ? error.message : 'خطای نامشخص در حالت نمایشی رخ داد.',
+      message: error instanceof Error ? error.message : 'خطای نامشخص در ثبت رویداد اهداکننده رخ داد.',
       color: 'red',
     });
   };
 
-  const handleResponse = (response: 'accepted' | 'declined') => {
+  const handleResponse = async (response: 'accepted' | 'declined') => {
     if (!selectedDonor) return;
     try {
-      respondDonor(selectedDonor.id, response);
+      await respondDonor(selectedDonor.id, response);
       notifications.show({
         title: response === 'accepted' ? 'دعوت پذیرفته شد' : 'دعوت رد شد',
         message:
@@ -114,10 +113,10 @@ export function DonorPage() {
     }
   };
 
-  const handleProgress = (progress: DonorProgress) => {
+  const handleProgress = async (progress: DonorProgress) => {
     if (!selectedDonor) return;
     try {
-      progressDonor(selectedDonor.id, progress);
+      await progressDonor(selectedDonor.id, progress);
       notifications.show({
         title: progress === 'donated' ? 'اهدای واقعی ثبت شد' : 'رویداد اهداکننده ثبت شد',
         message:

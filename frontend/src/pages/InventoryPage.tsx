@@ -34,12 +34,10 @@ import { BloodGroupBadge, ProductBadge } from '../components/Badges';
 import { EmptyState, InlineMessage } from '../components/StateViews';
 import {
   compatibleInventoryFor,
-  DemoError,
   inventoryExpiresAt,
   remainingUnits,
   useDemoStore,
 } from '../data/DemoStoreContext';
-import { CENTERS, HOSPITALS } from '../data/seed';
 import {
   expiryLabel,
   expiryTone,
@@ -57,7 +55,7 @@ import { createId } from '../lib/ids';
 const ALL = 'all';
 
 export function InventoryPage() {
-  const { state, dispatchInventory } = useDemoStore();
+  const { state, dispatchInventory, hospitals, centers } = useDemoStore();
   const [searchParams] = useSearchParams();
   const requestParam = searchParams.get('request');
 
@@ -77,7 +75,7 @@ export function InventoryPage() {
   const selectedRequest = state.requests.find((request) => request.id === selectedRequestId) ?? null;
   const compatibleItems = selectedRequest ? compatibleInventoryFor(state, selectedRequest) : [];
   const selectedItem = compatibleItems.find((item) => item.id === selectedItemId) ?? null;
-  const selectedHospital = selectedRequest ? HOSPITALS.find((hospital) => hospital.id === selectedRequest.hospital_id) : null;
+  const selectedHospital = selectedRequest ? hospitals.find((hospital) => hospital.id === selectedRequest.hospital_id) : null;
   const travelMinutes = selectedHospital && selectedItem ? selectedHospital.travel_min[selectedItem.center_id] ?? 30 : 30;
   const etaMinutes = 10 + travelMinutes;
 
@@ -131,7 +129,7 @@ export function InventoryPage() {
     setDispatchOpen(true);
   };
 
-  const handleDispatch = () => {
+  const handleDispatch = async () => {
     if (!selectedRequest) {
       notifications.show({ title: 'درخواست انتخاب نشده', message: 'یک درخواست فعال انتخاب کنید.', color: 'orange' });
       return;
@@ -141,7 +139,7 @@ export function InventoryPage() {
       return;
     }
     try {
-      const dispatch = dispatchInventory({
+      const dispatch = await dispatchInventory({
         item_id: selectedItem.id,
         request_id: selectedRequest.id,
         units,
@@ -157,7 +155,7 @@ export function InventoryPage() {
     } catch (error) {
       notifications.show({
         title: 'تخصیص انجام نشد',
-        message: error instanceof DemoError ? error.message : 'خطای نامشخص در حالت نمایشی رخ داد.',
+        message: error instanceof Error ? error.message : 'خطای نامشخص در تخصیص موجودی رخ داد.',
         color: 'red',
       });
     }
@@ -185,7 +183,7 @@ export function InventoryPage() {
         <StatCard
           label="موجودی کل"
           value={formatUnits(totalUnits)}
-          hint={`${formatNumber(state.inventory.length)} ردیف در ${formatNumber(CENTERS.length)} مرکز`}
+          hint={`${formatNumber(state.inventory.length)} ردیف در ${formatNumber(centers.length)} مرکز`}
           icon={<Drop size={21} weight="duotone" />}
           color="brand"
         />
@@ -229,7 +227,7 @@ export function InventoryPage() {
               onChange={(value) => setCenterFilter(value ?? ALL)}
               data={[
                 { value: ALL, label: 'همه مراکز' },
-                ...CENTERS.map((center) => ({ value: center.id, label: center.name })),
+                ...centers.map((center) => ({ value: center.id, label: center.name })),
               ]}
               allowDeselect={false}
             />

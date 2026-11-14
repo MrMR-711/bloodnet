@@ -46,7 +46,6 @@ import {
 import { EmptyState, ErrorState, InlineMessage } from '../components/StateViews';
 import {
   compatibleUnitsFor,
-  DemoError,
   remainingUnits,
   useDemoStore,
 } from '../data/DemoStoreContext';
@@ -73,6 +72,7 @@ export function RequestDetailPage() {
   const { requestId } = useParams<{ requestId: string }>();
   const {
     state,
+    mode,
     approveRequest,
     cancelRequest,
     amendRequest,
@@ -125,17 +125,17 @@ export function RequestDetailPage() {
   const notifyError = (error: unknown) => {
     notifications.show({
       title: 'عملیات انجام نشد',
-      message: error instanceof DemoError ? error.message : 'خطای نامشخص در حالت نمایشی رخ داد.',
+      message: error instanceof Error ? error.message : 'خطای نامشخص در به‌روزرسانی درخواست رخ داد.',
       color: 'red',
     });
   };
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     try {
-      approveRequest(request.id);
+      await approveRequest(request.id);
       notifications.show({
         title: 'درخواست تأیید شد',
-        message: 'وضعیت رسمی درخواست به open تغییر کرد.',
+        message: mode === 'live' ? 'وضعیت رسمی درخواست از API به open تغییر کرد.' : 'وضعیت رسمی درخواست به open تغییر کرد.',
         color: 'green',
         icon: <CheckCircle size={18} weight="fill" />,
       });
@@ -144,13 +144,13 @@ export function RequestDetailPage() {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     try {
-      cancelRequest(request.id);
+      await cancelRequest(request.id);
       setCancelOpen(false);
       notifications.show({
         title: 'درخواست لغو شد',
-        message: 'در وضعیت نمایشی، تأمین‌شده و تخصیص‌ها تغییر نکردند.',
+        message: mode === 'live' ? 'درخواست از API لغو شد؛ تأمین‌شده و تخصیص‌ها بدون تغییر ماندند.' : 'در وضعیت نمایشی، تأمین‌شده و تخصیص‌ها تغییر نکردند.',
         color: 'orange',
       });
     } catch (error) {
@@ -158,9 +158,9 @@ export function RequestDetailPage() {
     }
   };
 
-  const handleAmend = () => {
+  const handleAmend = async () => {
     try {
-      amendRequest(request.id, amendUrgency);
+      await amendRequest(request.id, amendUrgency);
       setAmendOpen(false);
       notifications.show({
         title: 'سطح فوریت اصلاح شد',

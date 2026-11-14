@@ -21,7 +21,6 @@ import { StatCard } from '../components/StatCard';
 import { StateBadge } from '../components/Badges';
 import { EmptyState, InlineMessage } from '../components/StateViews';
 import { activeRequestCount, useDemoStore } from '../data/DemoStoreContext';
-import { CENTERS } from '../data/seed';
 import {
   clampPercent,
   expiryLabel,
@@ -43,7 +42,7 @@ const PRODUCT_HEX: Record<(typeof PRODUCTS)[number], string> = {
 };
 
 export function DashboardPage() {
-  const { state } = useDemoStore();
+  const { state, centers } = useDemoStore();
 
   const activeRequests = state.requests.filter(
     (request) => !TERMINAL_STATES.includes(request.state as (typeof TERMINAL_STATES)[number]),
@@ -367,7 +366,7 @@ export function DashboardPage() {
 
             <SectionCard title="آمادگی مراکز" description="موجودی کل و ردیف‌های نزدیک انقضا">
               <Stack gap="sm">
-                {CENTERS.map((center) => {
+                {centers.map((center) => {
                   const items = state.inventory.filter((item) => item.center_id === center.id);
                   const units = items.reduce((sum, item) => sum + item.units, 0);
                   const risky = items.filter((item) =>

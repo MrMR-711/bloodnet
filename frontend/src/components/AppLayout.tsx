@@ -108,7 +108,7 @@ export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const [resetOpen, resetModal] = useDisclosure();
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
-  const { state, resetDemo } = useDemoStore();
+  const { state, mode, resetDemo } = useDemoStore();
   const { pathname } = useLocation();
   const meta = pageMeta(pathname);
 
@@ -140,12 +140,14 @@ export function AppLayout() {
     document.title = `${meta.title} · BloodNet`;
   }, [meta.title]);
 
-  const handleReset = () => {
-    resetDemo();
+  const handleReset = async () => {
+    await resetDemo();
     resetModal.close();
     notifications.show({
-      title: 'داده نمایشی بازنشانی شد',
-      message: 'همه درخواست‌ها، موجودی و رویدادها به حالت اولیه برگشتند.',
+      title: mode === 'live' ? 'داده‌ها همگام‌سازی شدند' : 'داده نمایشی بازنشانی شد',
+      message: mode === 'live'
+        ? 'آخرین وضعیت درخواست‌ها، موجودی و رویدادها از API دریافت شد.'
+        : 'همه درخواست‌ها، موجودی و رویدادها به حالت اولیه برگشتند.',
       color: 'green',
       icon: <CheckCircle size={18} weight="fill" />,
     });
@@ -374,20 +376,22 @@ export function AppLayout() {
               className="rounded-xl border border-[#D8EAE6] bg-[#F7FBFA]"
             >
               <Group gap="xs" wrap="nowrap">
-                <ThemeIcon size={30} radius="xl" variant="light" color="green" aria-hidden="true">
+                <ThemeIcon size={30} radius="xl" variant="light" color={mode === 'live' ? 'red' : 'gray'} aria-hidden="true">
                   <ShieldCheck size={17} weight="fill" />
                 </ThemeIcon>
                 <Box className="min-w-0">
                   <Text size="xs" fw={700} lh={1.4}>
-                    حالت نمایشی محلی
+                    {mode === 'live' ? 'داده زنده API' : 'حالت نمایشی محلی'}
                   </Text>
                   <Text size="xs" c="dimmed" lh={1.4}>
-                    بدون اتصال به Backend
+                    {mode === 'live' ? 'همگام با Backend' : 'بدون اتصال به Backend'}
                   </Text>
                 </Box>
               </Group>
               <Text size="xs" c="dimmed" mt={8} lh={1.65}>
-                داده‌ها ساختگی‌اند و مبنای تصمیم پزشکی نیستند.
+                {mode === 'live'
+                  ? 'داده‌ها از API خوانده می‌شوند و مبنای تصمیم پزشکی نیستند.'
+                  : 'داده‌ها ساختگی‌اند و مبنای تصمیم پزشکی نیستند.'}
               </Text>
             </Box>
             <Group justify="space-between" px={2}>
@@ -407,7 +411,7 @@ export function AppLayout() {
 
       <AppShell.Main className="bn-app-bg">
         <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
-          <DemoBanner />
+          {mode === 'demo' ? <DemoBanner /> : null}
           <Outlet />
           <Group
             justify="space-between"
