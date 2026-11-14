@@ -1,74 +1,41 @@
-# BloodNet — مخزن مستقل محصول
+# BloodNet — مرکز فرمان هماهنگی اهدای خون
 
-**وضعیت:** `FRONTEND DEMO IMPLEMENTED — BACKEND DECIDED, NOT IMPLEMENTED`
+**وضعیت:** Frontend Demo کامل؛ هسته Backend پیاده‌سازی و تست شده؛ اتصال کامل داده‌های UI به API باقی مانده است.
 
-این مخزن، مخزن مشترک محصول تیم برای چالش BloodNet است. Frontend واقعی با
-React، Tailwind CSS، Mantine، فارسی و RTL ساخته شده و در حالت نمایشی با داده
-محلی اجرا می‌شود. پشته Backend تصمیم‌گیری و مستند شده است، اما هیچ API
-اجرایی، Database، Migration یا جریان واقعی Backend هنوز ساخته نشده است.
+- مخزن عمومی: `https://github.com/MrMR-711/bloodnet`
+- Branch پیش‌فرض: `main`
+- Frontend: `http://localhost:5173`
+- Backend: `http://127.0.0.1:8000`
+- Swagger: `http://127.0.0.1:8000/docs`
 
-## دامنه فعلی
+## محصول چیست؟
 
-- مخزن مستقل محصول در مسیر `../bloodnet/` نسبت به ریشه Workspace.
-- Branch ادغام: `main`.
-- Branch کاری Backend: `backend` — مالک: `MrMR-711`.
-- Branch کاری Frontend: `frontend` — مالک: `Reza-zahedi`.
-- منابع رسمی فقط از `../main_cloned/` خوانده می‌شوند؛ آن پوشه فقط‌خواندنی است.
-- توسعه مستقیم روزمره روی `main` ممنوع است.
+BloodNet جریان هماهنگی اهدای خون را از ثبت درخواست بیمار تا تخصیص موجودی، دعوت اهداکننده و ثبت اهدا نمایش می‌دهد. رابط کاربری فارسی و RTL است و تجربه کامل را در حالت نمایشی ارائه می‌کند. Backend قرارداد API، ایدمپوتنسی، تخصیص FEFO و قواعد ایمنی را پیاده کرده است.
 
-## Remote
-
-- URL: `https://github.com/MrMR-711/bloodnet`
-- Visibility: `Private`
-- Default Branch: `main`
-- Branchهای موجود: `main`، `backend`، `frontend`
-
-## ساختار پیشنهادی
+## ساختار
 
 ```text
 bloodnet/
-├── backend/            # تصمیم‌ها و Placeholder؛ بدون کد اجرایی
-├── frontend/           # اپلیکیشن React + Tailwind + Mantine (حالت نمایشی)
-├── docs/               # مستندات Bootstrap، Git و وضعیت محیط
-├── participant_kit/    # منابع رسمی کپی‌شده بدون تغییر
-├── harness/            # Harness رسمی کپی‌شده بدون تغییر
-├── examples/           # نمونه‌های رسمی کپی‌شده بدون تغییر
-├── tests/              # تست‌های عمومی کیت
-├── AGENTS.md
-├── SOURCE-PROVENANCE.md
-└── README.md
+├── backend/            # FastAPI + SQLAlchemy + Alembic + تست‌ها
+├── frontend/           # React + TypeScript + Vite + Mantine + Tailwind
+├── docs/               # تصمیم‌های فنی و مستندات
+├── participant_kit/    # منابع رسمی چالش
+├── harness/            # تست قرارداد و اجرای سناریو
+└── examples/           # نمونه‌های رسمی
 ```
 
-## هویت Commit و Branch
+## اجرای Backend
 
-| نقش | Branch | `user.name` | `user.email` |
-|---|---|---|---|
-| Backend | `backend` | `MrMR-711` | `mohammad117811@gmail.com` |
-| Frontend | `frontend` | `Reza-zahedi` | `zahdireza6327@gmail.com` |
-| ادغام | `main` | مالک واقعی عملیات ادغام | پس از تأیید |
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-هویت Author و حساب احراز هویت Push دو مفهوم جدا هستند. هر Commit باید با
-هویت واقعی همان عضو ثبت و بلافاصله به Remote همان Branch Push شود. Commit
-بدون Push، کار تکمیل‌شده محسوب نمی‌شود.
-
-جزئیات در [`docs/git-workflow.md`](docs/git-workflow.md) آمده است.
-
-## منابع رسمی
-
-منابع عمومی کیت با محتوای بدون تغییر از `../main_cloned/` کپی شده‌اند.
-منشأ، Commit مرجع و SHA-256 در [`SOURCE-PROVENANCE.md`](SOURCE-PROVENANCE.md)
-ثبت شده است.
-
-موارد زیر عمداً کپی نشده‌اند:
-
-- `starter/` — مرجع آموزشی است، نه محصول.
-- PDFهای رسمی — برای Runtime لازم نیستند.
-- `Dockerfile.example` و `docker-compose.example.yml` — Docker الزام محصول نیست.
-- `CHALLENGE.md` — در منبع وجود ندارد و بازسازی نمی‌شود.
-
-## اجرا
-
-Frontend در حالت نمایشی قابل اجراست:
+## اجرای Frontend
 
 ```bash
 cd frontend
@@ -76,20 +43,52 @@ npm install
 npm run dev
 ```
 
-رابط روی `http://localhost:5173` بالا می‌آید. داده‌ها در `localStorage` شبیه‌سازی
-می‌شوند و هیچ درخواستی به Backend واقعی ارسال نمی‌شود. جزئیات در
-[`frontend/README.md`](frontend/README.md) آمده است.
+سپس `http://localhost:5173` را باز کنید. نشانگر **API متصل** در هدر، سلامت Backend را هر ۱۵ ثانیه بررسی می‌کند. داده‌های اصلی UI فعلاً Demo و در `localStorage` هستند.
 
-Backend هنوز اجرایی نیست. تصمیم‌های قطعی آن در
-[`docs/technology-decisions.md`](docs/technology-decisions.md) ثبت شده‌اند. دستورهای
-موجود در منابع کیت برای Practice و Harness هستند و اجرای محصول محسوب نمی‌شوند.
+## تست
 
-## قواعد کلیدی
+```bash
+cd backend
+pytest -q
+```
 
-- هیچ Token، Password، Private Key یا `.env` واقعی در مخزن ذخیره نمی‌شود.
-- Remote مسابقه هرگز به این مخزن وصل نمی‌شود.
-- URL مخزن حدس زده نمی‌شود.
-- Force Push و History Rewrite ممنوع است.
-- هر Commit باید کوچک، تک‌موضوعی و با پیام فارسی یا Finglish باشد.
-- هر Commit باید فوراً Push شود؛ در صورت شکست:
-  `COMMIT CREATED — PUSH PENDING`.
+از ریشه مخزن، با اجرای سرور:
+
+```bash
+python -m harness.contract_tests --team http://127.0.0.1:8000
+python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
+```
+
+## قابلیت‌های کلیدی
+
+- ثبت درخواست با `Idempotency-Key`
+- تخصیص FEFO و رزرو موجودی
+- جلوگیری از Overfill و تخصیص ناسازگار
+- Callbackهای اهداکننده با `event_id` یکتا
+- Smart Service قاعده‌محور و قابل توضیح
+- `X-Request-ID` و Readiness Probe
+- Migration با Alembic
+
+## محدودیت‌ها
+
+- Frontend داده Demo دارد؛ فقط سلامت API متصل است.
+- قفل‌های Process-level برای چند Worker کافی نیستند.
+- SQLite برای Demo است؛ Production به PostgreSQL و Migration کامل نیاز دارد.
+- Auth فعلی Demo Token است.
+- Scheduler انقضای خودکار و Observability کامل باقی مانده است.
+- Smart Service توصیه‌ای و قاعده‌محور است، نه تشخیص پزشکی.
+
+## Git
+
+- Branch کاری Backend: `backend`
+- Branch کاری Frontend: `frontend`
+- ادغام روی `main`
+- Force Push و بازنویسی تاریخ ممنوع است.
+- هیچ Token یا `.env` واقعی در مخزن ذخیره نمی‌شود.
+
+## منابع
+
+- [`backend/README.md`](backend/README.md)
+- [`frontend/README.md`](frontend/README.md)
+- [`docs/technology-decisions.md`](docs/technology-decisions.md)
+- [`participant_kit/openapi.yaml`](participant_kit/openapi.yaml)

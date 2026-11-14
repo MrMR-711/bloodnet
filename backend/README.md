@@ -1,36 +1,80 @@
-# Backend — انتخاب فنی، بدون پیاده‌سازی
+# BloodNet Backend
 
-**وضعیت:** `STACK DECIDED — IMPLEMENTATION NOT STARTED`
+**وضعیت:** هسته Backend پیاده‌سازی و تست شده است. این نسخه برای Demo و داوری آماده است، نه Production کامل.
 
-این پوشه محل کد Backend محصول است. در این مرحله فقط تصمیم‌های فنی ثبت
-شده‌اند؛ هیچ کد، Dependency نصب‌شده، Schema، Migration یا API اجرایی در
-مخزن وجود ندارد.
+## اجرا
 
-- مالک Branch: `MrMR-711`
-- Email: `mohammad117811@gmail.com`
-- Language: Python `3.14.7`
-- Framework: FastAPI `0.162.5`
-- Server: Uvicorn `0.54.0`
-- ORM: SQLAlchemy `2.1.8` (sync)
-- Database: SQLite با WAL
-- Migration: Alembic `1.20.1`
-- Validation: Pydantic `2.14.3` + pydantic-settings `2.x`
-- HTTP client: httpx `0.28.1`
-- Tests: pytest `9.2.0`
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-جزئیات کامل و دلایل انتخاب در
-[`docs/technology-decisions.md`](../docs/technology-decisions.md) آمده است.
+آدرس‌ها:
 
-## مرز فعلی
+- API: `http://127.0.0.1:8000`
+- Swagger: `http://127.0.0.1:8000/docs`
+- Health: `http://127.0.0.1:8000/health`
+- Readiness: `http://127.0.0.1:8000/health/ready`
 
-- قرارداد عمومی فقط از `participant_kit/openapi.yaml` خوانده می‌شود.
-- Endpoint جدید خارج از قرارداد رسمی بدون مستندسازی و تأیید ساخته نمی‌شود.
-- Auth با توکن‌های Demo از Environment است؛ رمز یا Secret واقعی در مخزن
-  ذخیره نمی‌شود.
-- ساعت شبیه‌سازی از Gateway رسمی خوانده می‌شود.
-- فقط رویداد `donated` موجودی تأمین‌شده را افزایش می‌دهد.
+## Migration
 
-## پیش‌نیاز پیاده‌سازی بعدی
+```bash
+alembic upgrade head
+```
 
-پیش از افزودن کد اجرایی، باید زمان‌بندی پیاده‌سازی و تأیید معماری نهایی
-ثبت شود. این README به‌عنوان تأیید پیاده‌سازی تلقی نمی‌شود.
+Migration اولیه در `alembic/versions/20261114_0001_initial.py` قرار دارد.
+
+## تست
+
+```bash
+pytest -q
+```
+
+تست قرارداد از ریشه مخزن و با اجرای سرور:
+
+```bash
+python -m harness.contract_tests --team http://127.0.0.1:8000
+```
+
+Smoke نمونه:
+
+```bash
+python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
+```
+
+## معماری
+
+- FastAPI + Pydantic برای API و اعتبارسنجی
+- SQLAlchemy (sync) + SQLite با WAL
+- Alembic برای Migration
+- سرویس‌های خارجی Mock: Gateway `:9100`، Travel `:9200`، Inventory `:9300`
+- منطق دامنه در `app/services.py`، مسیرها در `app/routers.py`
+
+## قابلیت‌ها
+
+- ثبت درخواست با `Idempotency-Key` و پاسخ تکرارپذیر
+- چرخه وضعیت درخواست: `pending_review`، `open`، `mobilizing`، `partially_fulfilled`، `fulfilled`، `cancelled`
+- تخصیص موجودی با FEFO برای درخواست‌های planned و اولویت فاصله برای critical/urgent
+- Dispatch اتمی در سطح سرویس و جلوگیری از تخصیص دوباره با `dispatch_id`
+- Callbackهای اهداکننده با `event_id` یکتا و جلوگیری از شمارش دوباره
+- فقط رویداد `donated` مقدار `supplied_units` را افزایش می‌دهد
+- Smart Service قاعده‌محور و Deterministic با خروجی قابل توضیح
+- `X-Request-ID` روی همه پاسخ‌ها و Readiness Probe
+
+## محدودیت‌های صادقانه
+
+- قفل‌های `threading.Lock` فقط در یک Process معتبرند؛ برای چند Worker به قفل دیتابیسی/صف نیاز است.
+- SQLite برای Demo مناسب است؛ Production به PostgreSQL، Backup و Pooling نیاز دارد.
+- Auth فعلی Demo Token است؛ OAuth2/OIDC، Rate Limit و امضای Callback ندارد.
+- Scheduler انقضای خودکار درخواست پیاده نشده است.
+- Observability کامل (Metrics/Tracing/Alerting) باقی مانده است.
+- Frontend فعلاً داده Demo دارد و فقط سلامت API را بررسی می‌کند.
+
+## منابع
+
+- قرارداد: `../participant_kit/openapi.yaml`
+- تصمیم‌های فنی: `../docs/technology-decisions.md`
+- Harness: `../harness`
