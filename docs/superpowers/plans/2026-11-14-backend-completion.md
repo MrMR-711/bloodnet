@@ -110,8 +110,9 @@
 - [x] **Step 3: Start backend and run `python -m harness.contract_tests --team http://127.0.0.1:8000`**
 - [x] **Step 4: Run one practice smoke scenario and record the score**
 - [ ] **Step 5: Commit and push `main`; fast-forward `backend` branch if it exists**
-  - Commit/Push نهایی مستندات پس از همین فایل انجام می‌شود.
+  - Commit/Push مستندات روی `main` انجام شد: `a133694` (`origin/main` هم‌سطح).
   - `backend` در `f324684` است و fast-forward نشده؛ `main` مرجع تحویل است.
+  - این Step به‌دلیل انجام‌نشدن fast-forward، باز می‌ماند.
 
 ---
 
