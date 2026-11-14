@@ -440,6 +440,61 @@ def list_requests(db) -> list[dict]:
     return [request_state(row) for row in rows]
 
 
+def catalog() -> dict:
+    kit = load_kit()
+    return {
+        "hospitals": [
+            {"id": h.hospital_id, "name": h.name, "lat": h.lat, "lon": h.lon}
+            for h in kit.hospitals.values()
+        ],
+        "centers": [
+            {"id": c.center_id, "name": c.name, "lat": c.lat, "lon": c.lon}
+            for c in kit.centers.values()
+        ],
+        "products": ["red_cells", "platelets", "plasma"],
+        "blood_groups": BLOOD_GROUPS,
+    }
+
+
+def list_audit_events(db, limit: int = 200) -> list[dict]:
+    rows = db.scalars(
+        select(AuditEvent).order_by(AuditEvent.sim_time.desc(), AuditEvent.id.desc()).limit(limit)
+    ).all()
+    return [{
+        "id": a.id, "sim_time": a.sim_time, "request_id": a.request_id,
+        "actor": a.actor, "actor_role": a.actor_role, "type": a.type,
+        "summary": a.summary, "effect": a.effect,
+    } for a in rows]
+
+
+def list_donors(db, limit: int = 200) -> list[dict]:
+    kit = load_kit()
+    donor_groups = {d.donor_id: d.blood_group for d in kit.donors}
+    notifications = db.scalars(
+        select(Notification)
+        .where(Notification.template == "request_wave")
+        .order_by(Notification.created_sim.desc())
+        .limit(limit)
+    ).all()
+    events = db.scalars(
+        select(DonorEvent).order_by(DonorEvent.sim_time.desc())
+    ).all()
+    latest_event: dict[tuple[str, str], str] = {}
+    for event in events:
+        latest_event.setdefault((event.request_id, event.donor_id), event.event)
+    return [{
+        "donor_id": n.donor_id,
+        "request_id": n.request_id,
+        "blood_group": donor_groups.get(n.donor_id, ""),
+        "response": n.response,
+        "active": n.active,
+        "gateway_status": n.gateway_status,
+        "event": latest_event.get((n.request_id, n.donor_id)),
+        "created_sim": n.created_sim,
+        "updated_sim": n.updated_sim,
+    } for n in notifications]
+
+
 def request_detail(db, request_id: str) -> dict:
     req = get_request(db, request_id)
     dispatches = db.scalars(select(Dispatch).where(Dispatch.request_id == req.id).order_by(Dispatch.created_sim.desc())).all()

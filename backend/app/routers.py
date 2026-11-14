@@ -20,10 +20,10 @@ from .schemas import (
 from .services import (
     ACTIVATION_LOCK,
     CALLBACK_LOCK,
-    amend_request, approve_request, audit, cancel_request, create_request,
+    amend_request, approve_request, audit, cancel_request, catalog, create_request,
     get_request, handle_donor_progress, handle_donor_response,
-    handle_gateway_status, list_requests, new_id, request_detail, request_state,
-    resolve_sim_time, smart_advice, smart_priorities,
+    handle_gateway_status, list_audit_events, list_donors, list_requests, new_id,
+    request_detail, request_state, resolve_sim_time, smart_advice, smart_priorities,
 )
 
 router = APIRouter()
@@ -204,6 +204,21 @@ def _dispatch_locked(body: DispatchRequest, db: Session, sim: float):
     audit(db, sim, req.id, "hospital", "hospital", "stock_dispatched", f"{body.units} واحد ارسال شد", "allocated_units افزایش یافت؛ supplied بدون تغییر")
     db.commit()
     return JSONResponse(status_code=201, content=result)
+
+
+@router.get("/catalog")
+def read_catalog(_: Annotated[None, Depends(hospital_auth)]):
+    return catalog()
+
+
+@router.get("/audit")
+def read_audit(db: DB, _: Annotated[None, Depends(hospital_auth)]):
+    return {"items": list_audit_events(db)}
+
+
+@router.get("/donors")
+def read_donors(db: DB, _: Annotated[None, Depends(hospital_auth)]):
+    return {"items": list_donors(db)}
 
 
 @router.get("/smart/priorities")

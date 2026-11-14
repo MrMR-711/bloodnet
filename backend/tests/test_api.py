@@ -140,6 +140,32 @@ def test_unknown_hospital_rejected(client):
     assert response.json()["error"]["code"] == "unknown_hospital"
 
 
+def test_catalog_exposes_kit_ids(client):
+    response = client.get("/catalog", headers=HOSPITAL)
+    assert response.status_code == 200
+    body = response.json()
+    assert any(item["id"] == "H01" for item in body["hospitals"])
+    assert any(item["id"].startswith("MC") for item in body["centers"])
+
+
+def test_audit_and_donor_read_endpoints(client, monkeypatch):
+    monkeypatch.setattr("app.services.inventory_items", lambda: [])
+    monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
+
+    rid = create(client, units=1).json()["request_id"]
+    approved = client.post(f"/requests/{rid}/approve", headers={**COORDINATOR, "X-Sim-Time": "20"}, json={})
+    assert approved.status_code == 200
+
+    audit_response = client.get("/audit", headers=HOSPITAL)
+    assert audit_response.status_code == 200
+    assert any(item["request_id"] == rid for item in audit_response.json()["items"])
+
+    donor_response = client.get("/donors", headers=HOSPITAL)
+    assert donor_response.status_code == 200
+    donors = donor_response.json()["items"]
+    assert any(item["request_id"] == rid and item["blood_group"] for item in donors)
+
+
 def test_request_lifecycle_and_callback_dedupe(client, monkeypatch):
     monkeypatch.setattr("app.services.inventory_items", lambda: [])
     monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
