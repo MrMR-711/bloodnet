@@ -551,7 +551,7 @@ def test_two_donations_cannot_overfill_request(client, monkeypatch):
     assert state["status"] == "fulfilled"
 
 
-def test_critical_wave_has_safety_margin(client, monkeypatch):
+def test_critical_wave_uses_three_times_deficit(client, monkeypatch):
     monkeypatch.setattr("app.services.inventory_items", lambda: [])
     monkeypatch.setattr("app.services.send_message", lambda payload: (202, {"ok": True}))
     rid = create(client, key="critical-wave-margin", units=1, urgency="critical").json()["request_id"]
@@ -564,7 +564,7 @@ def test_critical_wave_has_safety_margin(client, monkeypatch):
         donors = db.scalars(select(Notification).where(
             Notification.request_id == rid, Notification.template == "request_wave"
         )).all()
-        assert len(donors) >= 6
+        assert len(donors) >= 3
 
 
 def test_unhandled_error_keeps_request_id_and_cors(monkeypatch):

@@ -77,7 +77,7 @@ python -m harness.runner --team http://127.0.0.1:8000 --scenario P-normal
 - قفل‌های `threading.Lock` فقط در یک Process معتبرند؛ برای چند Worker به قفل دیتابیسی/صف نیاز است.
 - قفل Dispatch در یک Process نگه داشته می‌شود و I/O خارجی را هم پوشش می‌دهد؛ Production به تراکنش/رزرو اتمی و Timeout کوتاه‌تر نیاز دارد.
 - اگر دو اهداکننده هم‌زمان در مسیر باشند، ممکن است اهدای فیزیکی دوم هم ثبت شود؛ شمارنده‌های درخواست از سقف عبور نمی‌کنند و دعوت‌های بعدی متوقف می‌شوند.
-- نتیجه Smoke به Seed و سناریو وابسته است. Seed 4000: امتیاز 98.8 و Critical SLA برابر 1.0. Seed 4001 با همان کد: امتیاز 70.5 و Critical SLA برابر 0.333.
+- نتیجه Smoke به Seed و سناریو وابسته است. دو اجرای Seed 4000 با کد نهایی: امتیازهای 95.7 و 98.8 و Critical SLA برابر 1.0. Seed 4001 با همان کد: امتیاز 70.5 و Critical SLA برابر 0.333.
 - در Seed 4001، درخواست Critical پلاکت O+ به‌دلیل نبود موجودی سازگار و زمان ۹۰ دقیقه‌ای Apheresis در SLA 90 دقیقه‌ای قابل تحقق نبود؛ محدودیت داده و فرایند است، نه کندی Query یا Dispatch.
 - SQLite برای Demo مناسب است؛ Production به PostgreSQL، Backup و Pooling نیاز دارد.
 - Auth فعلی Demo Token است؛ OAuth2/OIDC، Rate Limit و امضای Callback ندارد.

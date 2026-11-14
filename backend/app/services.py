@@ -325,11 +325,8 @@ def activate_request(db, request_id: str) -> None:
             return
         remaining = max(0, req.units - req.allocated_units)
         if remaining > 0:
-            if req.urgency == "critical":
-                wave = max(6, int(math.ceil(remaining * 3.0)))
-            else:
-                multiplier = 2.5 if req.urgency == "urgent" else 1.5
-                wave = int(math.ceil(remaining * multiplier))
+            multiplier = 3.0 if req.urgency == "critical" else (2.5 if req.urgency == "urgent" else 1.5)
+            wave = int(math.ceil(remaining * multiplier))
             donor_ids = _pick_donors(db, req, sim, max(1, min(60, wave)))
             sent = 0
             for donor_id in donor_ids:
